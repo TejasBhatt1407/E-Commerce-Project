@@ -9,112 +9,75 @@ import com.ecommerce.dao.OrderDAO;
 import com.ecommerce.model.Address;
 import com.ecommerce.model.Cart;
 import com.ecommerce.util.DBConnection;
+import com.ecommerce.model.Order;
 
 public class OrderService {
 
-    private CartDAO cartDAO = new CartDAO();
-    private OrderDAO orderDAO = new OrderDAO();
-    private AddressDAO addressDAO = new AddressDAO();
+	private CartDAO cartDAO = new CartDAO();
+	private OrderDAO orderDAO = new OrderDAO();
+	private AddressDAO addressDAO = new AddressDAO();
+	
+	
+	public List<Order> getOrdersByUser(int userId) {
 
-    public boolean placeOrder(int userId,
-                              Address address,
-                              boolean saveAddress)
-    {
+		OrderDAO dao = new OrderDAO();
 
-        Connection con = null;
+		return dao.getOrdersByUser(userId);
+	}
 
-        try {
+	public boolean placeOrder(int userId, Address address, boolean saveAddress) {
 
-            con = DBConnection.getConnection();
+		Connection con = null;
 
-            con.setAutoCommit(false);
+		try {
 
-            List<Cart> cartItems =
-                    cartDAO.getCartItems(userId);
+			con = DBConnection.getConnection();
 
-            if(cartItems.isEmpty()) {
+			con.setAutoCommit(false);
 
-                con.rollback();
+			List<Cart> cartItems = cartDAO.getCartItems(userId);
+			if (cartItems.isEmpty()) {
+				con.rollback();
+				return false;
+			}
 
-                return false;
-            }
+			int totalAmount = 0;
+			int totalItems = 0;
 
-            int totalAmount = 0;
-            int totalItems = 0;
+			for (Cart cart : cartItems) {
+				totalAmount += cart.getQuantity() * cart.getProduct().getPrice();
+				totalItems += cart.getQuantity();
+			}
 
-            for(Cart cart : cartItems){
+			if (saveAddress) {
+				addressDAO.saveAddress(con, address);
+			}
 
-                totalAmount +=
-                        cart.getQuantity() *
-                        cart.getProduct().getPrice();
+			int orderId = orderDAO.createOrder(con, userId, totalAmount, totalItems);
 
-                totalItems +=
-                        cart.getQuantity();
-            }
+			orderDAO.saveOrderItems(con, orderId, cartItems);
+			orderDAO.updateProductQuantity(con, cartItems);
 
-            if(saveAddress){
-
-                addressDAO.saveAddress(con,address);
-
-            }
-
-            int orderId =
-                    orderDAO.createOrder(
-                            con,
-                            userId,
-                            totalAmount,
-                            totalItems);
-
-            orderDAO.saveOrderItems(
-                    con,
-                    orderId,
-                    cartItems);
-
-            orderDAO.updateProductQuantity(
-                    con,
-                    cartItems);
-
-            cartDAO.clearCart(
-                    con,
-                    userId);
-
-            con.commit();
-
-            return true;
-
-        }
-
-        catch(Exception e){
-
-            try{
-
-                if(con!=null)
-                    con.rollback();
-
-            }catch(Exception ex){}
-
-            e.printStackTrace();
-
-        }
-
-        finally{
-
-            try{
-
-                if(con!=null){
-
-                    con.setAutoCommit(true);
-
-                    con.close();
-
-                }
-
-            }catch(Exception e){}
-
-        }
-
-        return false;
-
-    }
+			cartDAO.clearCart(con, userId);
+			con.commit();
+			return true;
+		} catch (Exception e) {
+			try {
+				if (con != null)
+					con.rollback();
+			} catch (Exception ex) {
+			}
+			e.printStackTrace();
+		} finally {
+			try {
+				if (con != null) {
+					con.setAutoCommit(true);
+					con.close();
+				}
+			} catch (Exception e) {
+			}
+		}
+		return false;
+	}
 
 }

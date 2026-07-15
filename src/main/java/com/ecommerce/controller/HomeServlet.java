@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ecommerce.model.Product;
 import com.ecommerce.service.ProductService;
+import com.ecommerce.service.CartService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,48 +25,55 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
             throws ServletException, IOException {
-    	
-    	HttpSession session = request.getSession(false);
 
-    	int userId = (Integer) session.getAttribute("loggedInUserId");
+        HttpSession session = request.getSession(false);
 
-        // Always load all product types
+        int userId = (Integer) session.getAttribute("loggedInUserId");
+
+        // Load all product types
         List<String> types = productService.getAllTypes();
         request.setAttribute("types", types);
 
-        // Get selected type and sub type
+        // Selected values from URL
         String type = request.getParameter("type");
         String subType = request.getParameter("subType");
 
-        // If a type is selected, load its sub types
-        if (type != null && !type.trim().isEmpty()) {
-
-            List<String> subTypes = productService.getSubTypes(type);
-
-            request.setAttribute("selectedType", type);
-            request.setAttribute("subTypes", subTypes);
+        // If no type selected, use first type
+        if ((type == null || type.trim().isEmpty()) && !types.isEmpty()) {
+            type = types.get(0);
         }
 
-        // If both type and sub type are selected, load products
-        if (type != null && !type.trim().isEmpty()
-                && subType != null && !subType.trim().isEmpty()) {
+        // Load subtypes of selected/default type
+        List<String> subTypes = productService.getSubTypes(type);
+
+        // If no subtype selected, use first subtype
+        if ((subType == null || subType.trim().isEmpty()) && !subTypes.isEmpty()) {
+            subType = subTypes.get(0);
+        }
+
+        // Send selected values to JSP
+        request.setAttribute("selectedType", type);
+        request.setAttribute("subTypes", subTypes);
+        request.setAttribute("selectedSubType", subType);
+
+        // Load products only if both values exist
+        if (type != null && subType != null) {
 
             List<Product> products =
-                    productService.getProducts(userId,type, subType);
-            
-            for ( Product product: products) {
-            	
-            	System.out.println("Values \n" + product.toString() );
-				
-			}
-//            System.out.println("Type      : " + type);
-//            System.out.println("Sub Type  : " + subType);
-//            System.out.println("Products  : " + products.size());
-            
+                    productService.getProducts(userId, type, subType);
 
-            request.setAttribute("selectedSubType", subType);
+            for (Product product : products) {
+                System.out.println(product);
+            }
+
             request.setAttribute("products", products);
         }
+        
+        CartService cartService = new CartService();
+
+        int cartCount = cartService.getCartCount(userId);
+
+        request.setAttribute("cartCount", cartCount);
 
         request.getRequestDispatcher("home.jsp")
                .forward(request, response);

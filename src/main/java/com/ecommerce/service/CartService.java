@@ -34,5 +34,11 @@ public class CartService {
     public boolean clearCart(int userId) {
     	return cartDAO.clearCart(userId);
     }
+    public int getCartCount(int userId) {
+        return cartDAO.getCartCount(userId);
+    }
+    public int getProductQuantity(int userId, int productId) {
+        return cartDAO.getProductQuantity(userId, productId);
+    }
 
 }

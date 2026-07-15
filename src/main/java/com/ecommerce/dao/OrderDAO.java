@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
+import java.util.ArrayList;
 
+import com.ecommerce.model.Order;
+import com.ecommerce.util.DBConnection;
 import com.ecommerce.model.Cart;
 
 public class OrderDAO {
@@ -35,6 +38,48 @@ public class OrderDAO {
 
         return -1;
     }
+    
+    public List<Order> getOrdersByUser(int userId) {
+
+        List<Order> orders = new ArrayList<>();
+
+        String sql = """
+                SELECT *
+                FROM orders
+                WHERE user_id = ?
+                ORDER BY order_date DESC
+                """;
+
+        try (
+                Connection con = DBConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+        ) {
+
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Order order = new Order();
+
+                order.setId(rs.getInt("id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setTotalAmount(rs.getInt("total_amount"));
+                order.setTotalItems(rs.getInt("total_items"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setStatus(rs.getString("status"));
+
+                orders.add(order);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return orders;
+    }
+    
 
     public void saveOrderItems(Connection con,
                                int orderId,

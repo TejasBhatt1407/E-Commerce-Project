@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ecommerce.model.Cart;
+import com.ecommerce.dao.CartDAO;
 import com.ecommerce.service.CartService;
 
 import jakarta.servlet.ServletException;
@@ -45,6 +46,10 @@ public class CartServlet extends HttpServlet {
         request.getRequestDispatcher("cart.jsp")
                .forward(request, response);
 
+    }
+    private CartDAO cartDAO = new CartDAO();
+    public int getProductQuantity(int userId, int productId) {
+        return cartDAO.getProductQuantity(userId, productId);
     }
 
 }

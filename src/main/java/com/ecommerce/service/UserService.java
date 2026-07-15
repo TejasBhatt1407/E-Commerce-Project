@@ -36,5 +36,12 @@ public class UserService { // acts as a mediator btw UI and Database
 		}
 		return new Response<>(false, ResponseCode.FAILED, "Registration Failed", null);
 	}
+	public boolean emailExists(String email) {
+
+	    UserDAO dao = new UserDAO();
+
+	    return dao.emailExists(email);
+
+	}
 
 }

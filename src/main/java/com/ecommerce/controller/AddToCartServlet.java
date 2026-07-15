@@ -40,7 +40,13 @@ public class AddToCartServlet extends HttpServlet {
 
         cartService.addToCart(userId, productId);
 
-        response.sendRedirect("CartServlet");// CartServlet soon , home servlet before
+        int cartCount = cartService.getCartCount(userId);
+
+        response.setContentType("text/plain");
+        response.getWriter().print(cartCount);
+        
+        
+        //response.sendRedirect("CartServlet");// CartServlet soon , home servlet before
     }
 }
 	

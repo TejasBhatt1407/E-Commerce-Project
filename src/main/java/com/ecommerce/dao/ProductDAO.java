@@ -39,7 +39,7 @@ public class ProductDAO {
 
 	
 	
-    public List<Product> getAllProducts() {
+    public List<Product> getAllProducts() {   // for page
 
         List<Product> products = new ArrayList<>();
 
@@ -101,7 +101,7 @@ public class ProductDAO {
         return types;
     }
     
-    public List<Product> getProducts(int userId, String type, String subType) {
+    public List<Product> getProducts(int userId, String type, String subType) { // for cart
 
         List<Product> products = new ArrayList<>();
 

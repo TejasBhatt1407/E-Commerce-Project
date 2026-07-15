@@ -177,10 +177,20 @@ text-align:center;
 	<%
 String image = product.getImage();
 
-if(image == null || image.trim().isEmpty()){
-    image = "images/no-image.png";
+if (image == null || image.trim().isEmpty()) {
+    image = "default-placeholder.png"; // Set the fallback filename string
+} else {
+    image = product.getImage().trim(); // Use the valid filename string
 }
+// We close the Java block here cleanly before rendering HTML
 %>
+
+<img src="<%= request.getContextPath() %>/images/products/<%= image %>"
+     alt="<%= (product.getName() != null) ? product.getName() : "Product Image" %>"
+     style="max-width: 90%; height: auto; object-fit: contain;">
+
+
+
 
 		</div>
 
@@ -202,7 +212,7 @@ if(image == null || image.trim().isEmpty()){
 				<%
 if (product.getQuantity() > 0) {
 %>
-	</p> <!-- Closes the dangling paragraph tag from your snippet -->
+	</p> 
 
 	<% if(product.getCartQuantity() == 0) { %>
 		<!-- Case 1: Item is not in the cart yet -->

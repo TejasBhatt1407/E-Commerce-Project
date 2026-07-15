@@ -3,7 +3,7 @@ package com.ecommerce.controller;
 import java.io.IOException;
 
 import com.ecommerce.service.CartService;
-
+import com.ecommerce.dao.CartDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -56,13 +56,21 @@ public class UpdateCartServlet  extends HttpServlet{
 
         
         
-        String source = request.getParameter("source");
+//        String source = request.getParameter("source");
+//
+//        if ("home".equals(source)) {
+//            response.sendRedirect("HomeServlet");
+//        } else {
+//            response.sendRedirect("CartServlet");
+//        }
+        
+        CartService cartService = new CartService();
 
-        if ("home".equals(source)) {
-            response.sendRedirect("HomeServlet");
-        } else {
-            response.sendRedirect("CartServlet");
-        }
+        int updatedQuantity =
+                cartService.getProductQuantity(userId, productId);
+
+        response.setContentType("text/plain");
+        response.getWriter().print(updatedQuantity);
     }
 	
 	

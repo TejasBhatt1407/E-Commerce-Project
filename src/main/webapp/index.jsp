@@ -179,6 +179,12 @@ if(responseObj != null){
 		}
 		%>
 	</div>
+	
+	<div style="text-align:center;margin-top:15px;">
+    <a href="forgotPassword.jsp">
+        Forgot Password?
+    </a>
+</div>
 
 </body>
 </html>

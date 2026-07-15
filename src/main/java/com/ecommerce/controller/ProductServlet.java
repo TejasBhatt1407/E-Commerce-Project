@@ -54,9 +54,9 @@ public class ProductServlet extends HttpServlet {
 
     	request.setAttribute("selectedQuantity", selectedQuantity);
     	
-    	System.out.println("Action = " + request.getParameter("action"));
-    	System.out.println("Quantity = " + request.getParameter("quantity"));
-    	System.out.println("Product Id = " + request.getParameter("id"));
+//    	System.out.println("Action = " + request.getParameter("action"));
+//    	System.out.println("Quantity = " + request.getParameter("quantity"));
+//    	System.out.println("Product Id = " + request.getParameter("id"));
     	
     	request.setAttribute("product", product);
     	request.setAttribute("selectedQuantity", selectedQuantity);

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import com.ecommerce.model.User;
 import com.ecommerce.util.DBConnection;
+import com.ecommerce.service.UserService;
 
 public class UserDAO {
 
@@ -122,5 +123,28 @@ public class UserDAO {
 
 	    return user;
 	}
+	
+	public boolean updatePassword(String email,String password)
+	{
+	    String sql="UPDATE users SET password=? WHERE email=?";
+
+	    try(Connection con=DBConnection.getConnection();
+	        PreparedStatement ps=con.prepareStatement(sql))
+	    {
+	        ps.setString(1,password);
+
+	        ps.setString(2,email);
+
+	        return ps.executeUpdate()>0;
+	    }
+	    catch(Exception e)
+	    {
+	        e.printStackTrace();
+	    }
+
+	    return false;
+	}
+	
+	
 
 }
