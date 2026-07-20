@@ -35,9 +35,9 @@ public class LogoutServlet extends HttpServlet {
 				ps.executeUpdate();
 
 			} catch (Exception e) {
-				e.printStackTrace();
+			    request.setAttribute("jakarta.servlet.error.exception", e);
+			    request.getRequestDispatcher("error.jsp").forward(request, response);
 			}
-
 			session.setAttribute("loggedInUser", null);
 			session.setAttribute("loggedInUserName", null);
 			session.setAttribute("loggedInUserId",null);
@@ -48,5 +48,6 @@ public class LogoutServlet extends HttpServlet {
 
 		// Redirect to login page after logout
 		response.sendRedirect("index.jsp");
+		return;
 	}
 }

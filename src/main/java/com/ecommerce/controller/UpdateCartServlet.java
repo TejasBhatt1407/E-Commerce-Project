@@ -4,12 +4,15 @@ import java.io.IOException;
 
 import com.ecommerce.service.CartService;
 import com.ecommerce.dao.CartDAO;
+import com.ecommerce.model.Cart;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 
 
 @WebServlet("/UpdateCartServlet") 
@@ -64,13 +67,37 @@ public class UpdateCartServlet  extends HttpServlet{
 //            response.sendRedirect("CartServlet");
 //        }
         
-        CartService cartService = new CartService();
 
-        int updatedQuantity =
-                cartService.getProductQuantity(userId, productId);
+        int updatedQuantity = cartService.getProductQuantity(userId, productId);
+
+        int cartCount = cartService.getCartCount(userId);
+
+        double subtotal = 0;
+
+        List<Cart> cartItems = cartService.getCartItems(userId);
+
+        double grandTotal = 0;
+
+        for (Cart cart : cartItems) {
+
+            grandTotal += cart.getQuantity() * cart.getProduct().getPrice();
+
+            if (cart.getProduct().getId() == productId) {
+
+                subtotal = cart.getQuantity() * cart.getProduct().getPrice();
+
+            }
+
+        }
 
         response.setContentType("text/plain");
-        response.getWriter().print(updatedQuantity);
+
+        response.getWriter().print(
+                updatedQuantity + "," +
+                cartCount + "," +
+                subtotal + "," +
+                grandTotal
+        );
     }
 	
 	

@@ -123,9 +123,17 @@
 		text-align: center;
 	}
 </style>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
+
 </head>
 
 <body>
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
 
 	<div class="login-container">
 		<h2>Login</h2>
@@ -150,7 +158,7 @@ if(responseObj != null){
 <% } %>
 
 
-		<form action="<%=request.getContextPath() %>/LoginServlet" method="post">
+		<form action="<%=request.getContextPath() %>/LoginServlet" method="post" onsubmit= "showLoader()">
 			<div class="form-group">
 				<label for="email">Email</label>
 				<input type="email" id="email" name="email" placeholder="Enter your email" required>

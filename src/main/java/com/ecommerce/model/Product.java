@@ -19,6 +19,8 @@ public class Product {
 	private int cartQuantity;
 	private String longDescription;
 	private String image;
+	private String typeIcon;
+	private String subtypeIcon;
 
 	public Product() {
 	}
@@ -110,6 +112,21 @@ public class Product {
 
 	public void setImage(String image) {
 	    this.image = image;
+	}
+	
+	public String getTypeIcon() {
+	    return typeIcon;
+	}
+
+	public void setTypeIcon(String typeIcon) {
+	    this.typeIcon = typeIcon;
+	}
+	
+	public void setSubtypeIcon(String subtypeIcon) {
+		this.subtypeIcon=subtypeIcon;
+	}
+	public String getSubtypeIcon() {
+		return subtypeIcon;
 	}
 	
 }

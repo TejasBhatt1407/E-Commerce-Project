@@ -73,8 +73,8 @@ public class OrderDAO {
                 orders.add(order);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(Exception e){
+            throw new RuntimeException(e);
         }
 
         return orders;

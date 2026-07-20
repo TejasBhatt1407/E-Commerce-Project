@@ -3,6 +3,7 @@ package com.ecommerce.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.ecommerce.model.Category;
 import com.ecommerce.service.ProductService;
 
 import jakarta.servlet.ServletException;
@@ -25,7 +26,7 @@ public class TypeServlet extends HttpServlet {
 
         System.out.println("Type received = " + type); 
         
-        List<String> subTypes =
+        List<Category> subTypes =
                 productService.getSubTypes(type);
 
         request.setAttribute("type", type);

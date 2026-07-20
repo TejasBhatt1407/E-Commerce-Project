@@ -141,9 +141,16 @@ button:hover{
 
 </style>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
+
 </head>
 
 <body>
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
 
 <div class="container">
 
@@ -157,7 +164,7 @@ button:hover{
 
     <% } %>
 
-    <form action="ForgotPasswordServlet" method="post">
+    <form action="ForgotPasswordServlet" method="post" onsubmit ="showLoader()">
 
         <label for="email">
             Registered Email
@@ -178,7 +185,7 @@ button:hover{
 
     <div class="back">
 
-        <a href="login.jsp">
+        <a href="index.jsp">
             Back to Login
         </a>
 

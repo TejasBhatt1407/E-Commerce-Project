@@ -120,17 +120,50 @@ textarea {
 .checkbox {
 	margin-top: 20px;
 }
+
+
+.back-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-family: sans-serif;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #007bff;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+/* Hover effect */
+.back-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Click effect */
+.back-btn:active {
+  transform: scale(0.98);
+}
+
+
 </style>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
 
 </head>
 
 <body>
 
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
 	<div class="container">
 
 		<h1>Checkout</h1>
 
-		<form action="PlaceOrderServlet" method="post">
+		<form action="PlaceOrderServlet" method="post" onsubmit="showLoader">
 
 			<div class="checkout-layout">
 
@@ -202,6 +235,7 @@ textarea {
 		</form>
 
 	</div>
+<a href=CartServlet class="back-btn">Previous</a>
 
 </body>
 

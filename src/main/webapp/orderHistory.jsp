@@ -114,9 +114,16 @@ h1 {
 }
 </style>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
+
 </head>
 
 <body>
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
 
 	<div class="container">
 

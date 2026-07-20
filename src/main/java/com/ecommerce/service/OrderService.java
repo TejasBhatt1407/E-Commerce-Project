@@ -61,7 +61,7 @@ public class OrderService {
 			cartDAO.clearCart(con, userId);
 			con.commit();
 			return true;
-		} catch (Exception e) {
+		} catch (Exception e) 		{
 			try {
 				if (con != null)
 					con.rollback();

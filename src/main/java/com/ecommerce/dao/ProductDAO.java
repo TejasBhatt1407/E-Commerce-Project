@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.ecommerce.model.Product;
 import com.ecommerce.util.DBConnection;
+import com.ecommerce.model.Category;
 
 public class ProductDAO {
 	
@@ -28,11 +29,14 @@ public class ProductDAO {
 				product.setLongDescription(rs.getString("long_description"));
      			product.setImage(rs.getString("image"));
      			product.setQuantity(rs.getInt("quantity"));
+     			product.setTypeIcon(rs.getString("type_icon"));
+     			product.setSubtypeIcon(rs.getString("subtype_icon"));
+     			
 //				product.setStock(rs.getInt("stock"));
 			}
 			con.close();
-		}catch(Exception e) {
-			e.printStackTrace();
+		}catch(Exception e){
+		    throw new RuntimeException(e);
 		}
 		return product;
 	}
@@ -63,22 +67,24 @@ public class ProductDAO {
                 product.setQuantity(rs.getInt("quantity"));
                 product.setDescription(rs.getString("description"));
                 product.setImage(rs.getString("image"));
+                product.setTypeIcon(rs.getString("type_icon"));
+                product.setSubtypeIcon(rs.getString("subtype_icon"));
 
                 products.add(product);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(Exception e){
+            throw new RuntimeException(e);
         }
 
         return products;
     }
     
-    public List<String> getAllTypes() {
+    public List<Category> getAllTypes() {
 
-        List<String> types = new ArrayList<>();
+        List<Category> types = new ArrayList<>();
 
-        String sql = "SELECT DISTINCT type FROM products ORDER BY type";
+        String sql = "SELECT DISTINCT type , type_icon FROM products ORDER BY type";
 
         try (
                 Connection con = DBConnection.getConnection();
@@ -88,14 +94,27 @@ public class ProductDAO {
 
             while (rs.next()) {
 
-                types.add(rs.getString("type"));
+            	// NEW: Create Category object
+                Category category = new Category();
 
+                // NEW: Set category name
+                category.setName(rs.getString("type"));
+
+                // NEW: Set icon
+                category.setIcon(rs.getString("type_icon"));
+
+                // CHANGED: Add Category instead of String
+                types.add(category);
             }
 
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
+        } 
+//            catch (Exception e) {
+//
+//            e.printStackTrace();
+//
+//        }
+        catch(Exception e){
+            throw new RuntimeException(e);
         }
 
         return types;
@@ -144,8 +163,12 @@ public class ProductDAO {
                 products.add(product);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } 
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        catch(Exception e){
+            throw new RuntimeException(e);
         }
 
         return products;
@@ -153,9 +176,9 @@ public class ProductDAO {
     
     
     
-    public List<String> getSubTypes(String type){
-    	List<String> subTypes= new ArrayList<>();
-    	String sql="select distinct sub_type from products where type =? order by sub_type";
+    public List<Category> getSubTypes(String type){
+    	List<Category> subTypes= new ArrayList<>();
+    	String sql="select distinct sub_type , subtype_icon from products where type =? order by sub_type";
     	try (
     			Connection con=DBConnection.getConnection();
     			PreparedStatement ps =con.prepareStatement(sql);
@@ -163,10 +186,22 @@ public class ProductDAO {
     		ps.setString(1, type);
     		ResultSet rs= ps.executeQuery();
     		while(rs.next()) {
-    			subTypes.add(rs.getString("sub_type"));
-    		}
-    	}catch (Exception e) {
-    		e.printStackTrace();
+    			Category category = new Category();
+
+                // NEW: Set category name
+                category.setName(rs.getString("sub_type"));
+
+                // NEW: Set icon
+                category.setIcon(rs.getString("subtype_icon"));
+
+                // CHANGED: Add Category instead of String
+                subTypes.add(category);    		}
+    	}
+//    	catch (Exception e) {
+//    		e.printStackTrace();
+//    	}
+    	catch(Exception e){
+    	    throw new RuntimeException(e);
     	}
     	return subTypes;
     }

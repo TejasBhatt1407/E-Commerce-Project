@@ -23,6 +23,17 @@ public class AddToCartServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
+        
+        System.out.println("Session = " + session);
+
+        if (session != null) {
+            System.out.println("loggedInUserId = " + session.getAttribute("loggedInUserId"));
+        }
+
+        System.out.println("productId = " + request.getParameter("productId"));
+        
+        
+        
         if(session == null){
             response.sendRedirect("HomeServlet");
             return;
@@ -34,8 +45,15 @@ public class AddToCartServlet extends HttpServlet {
             response.sendRedirect("HomeServlet");
             return;
         }
-        int productId = Integer.parseInt(request.getParameter("productId"));
+        String pid = request.getParameter("productId");
+        System.out.println("pid = " + pid);
 
+        if (pid == null) {
+            response.getWriter().print("productId missing");
+            return;
+        }
+
+        int productId = Integer.parseInt(pid);
         CartService cartService = new CartService();
 
         cartService.addToCart(userId, productId);

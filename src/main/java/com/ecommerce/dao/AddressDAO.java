@@ -28,10 +28,10 @@ public class AddressDAO {
             return ps.executeUpdate()>0;
 
         }catch(Exception e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        return false;
+//        return false;
 
     }
     

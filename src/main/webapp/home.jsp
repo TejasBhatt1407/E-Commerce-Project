@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%@ page import="com.ecommerce.model.Product"%>
+<%@ page import="com.ecommerce.model.Category"%>
 <%
 String email = (String) session.getAttribute("loggedInUser");
 if (email == null) {
@@ -10,8 +11,8 @@ if (email == null) {
 }
 
 String userName = (String) session.getAttribute("loggedInUserName");
-List<String> types = (List<String>) request.getAttribute("types");
-List<String> subTypes = (List<String>) request.getAttribute("subTypes");
+List<Category> types = (List<Category>) request.getAttribute("types");
+List<Category> subTypes = (List<Category>) request.getAttribute("subTypes");
 List<Product> products = (List<Product>) request.getAttribute("products");
 String selectedType = (String) request.getAttribute("selectedType");
 String selectedSubType = (String) request.getAttribute("selectedSubType");
@@ -396,82 +397,66 @@ body {
 
 /* CRITICAL: Shows the dropdown menu when hovering over the parent wrapper */
 .user-dropdown:hover .dropdown-content {
-	display: block;
+	display: block; . categoryIcon { width : 24px;
+	height: 24px;
+	margin-right: 8px;
+	vertical-align: middle;
+}
 }
 </style>
+
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
+
 </head>
 
-<body> 
 
 <body>
 
-	<a href="CartServlet" class="floatingCart">
-		🛒 <span id="cartCount">${cartCount}</span>
+	<div id="loader">
+		<div class="spinner"></div>
+	</div>
+
+	<a href="CartServlet" class="floatingCart"> 🛒 <span id="cartCount">${cartCount}</span>
 	</a>
 
 	<div class="header">
 
 		<div class="logo">
 			<a href="HomeServlet" style="text-decoration: none; color: inherit;">
-				GalaXy 8uy
-			</a>
+				GalaXy 8uy </a>
 		</div>
 
 		<div class="rightHeader">
 
-			<form action="HomeServlet" method="get">
-				<input class="searchBar"
-					   type="text"
-					   name="search"
-					   placeholder="Search Products...">
+			<form action="HomeServlet" method="get" onsubmit="showLoader()">
+				<input class="searchBar" type="text" name="search"
+					placeholder="Search Products...">
 			</form>
 
 			<span>Welcome, <%=userName%></span>
 
 			<div class="user-dropdown">
 
-				<input
-					type="checkbox"
-					id="dropdown-toggle"
-					class="dropdown-checkbox">
-
-				<label
-					for="dropdown-toggle"
-					class="dropdown-trigger-btn">
-
-					Account Menu
-
-				</label>
+				<input type="checkbox" id="dropdown-toggle"
+					class="dropdown-checkbox"> <label for="dropdown-toggle"
+					class="dropdown-trigger-btn"> Account Menu </label>
 
 				<div class="dropdown-content">
 
 					<a href="${pageContext.request.contextPath}/ProfileServlet"
-					   class="dropdown-item">
-
-						Profile
-
-					</a>
-
-					<a href="OrderHistoryServlet"
-					   class="dropdown-item">
-
-						Order History
-
-					</a>
+						class="dropdown-item"> Profile </a> <a href="OrderHistoryServlet"
+						class="dropdown-item"> Order History </a>
 
 					<hr class="dropdown-divider">
 
-					<form action="LogoutServlet"
-						  method="get"
-						  class="dropdown-logout-form">
+					<form action="LogoutServlet " method="get"
+						class="dropdown-logout-form" onsubmit="showLoader()">
 
-						<button
-							type="submit"
-							class="dropdown-item logout-btn">
+						<button type="submit" class="dropdown-item logout-btn">
 
-							Logout
-
-						</button>
+							Logout</button>
 
 					</form>
 
@@ -497,23 +482,27 @@ body {
 
 					<%
 					if(types != null){
-						for(String type : types){
-					%>
+						for(Category type : types){
+						%>
 
-						<form action="HomeServlet" method="get">
+					<form action="HomeServlet" method="get" onsubmit="showLoader()">
 
-							<input
-								type="hidden"
-								name="type"
-								value="<%=type%>">
+						<!-- CHANGED: Use category name -->
+						<input type="hidden" name="type" value="<%=type.getName()%>">
 
-							<button class="typeButton">
+						<button class="typeButton">
 
-								<%=type%>
+							<!-- NEW: Display icon -->
+							<img
+								src="<%=request.getContextPath()%>/images/icons/<%=type.getIcon()%>"
+								class="categoryIcon">
 
-							</button>
+							<!-- CHANGED: Display category name -->
+							<%=type.getName()%>
 
-						</form>
+						</button>
+
+					</form>
 
 					<%
 						}
@@ -532,17 +521,14 @@ body {
 		if(selectedType == null){
 		%>
 
-			<div class="products">
+		<div class="products">
 
-				<h2>Featured Products</h2>
+			<h2>Featured Products</h2>
 
-				<p style="margin-top:15px;color:#666;">
+			<p style="margin-top: 15px; color: #666;">Please select a product
+				type above to explore categories.</p>
 
-					Please select a product type above to explore categories.
-
-				</p>
-
-			</div>
+		</div>
 
 		<%
 		}
@@ -554,58 +540,56 @@ body {
 		if(selectedType != null){
 		%>
 
-			<div class="subTypeSection">
+		<div class="subTypeSection">
 
-				<h2>Sub Types</h2>
+			<h2>Sub Types</h2>
 
-				<%
+			<%
 				if(subTypes != null){
 				%>
 
-					<div class="subTypeButtons">
+			<div class="subTypeButtons">
 
-						<%
-						for(String subType : subTypes){
+				<%
+						for(Category subType : subTypes){
 						%>
 
-							<form action="HomeServlet" method="get">
+				<form action="HomeServlet" method="get" onsubmit="showLoader()">
 
-								<input
-									type="hidden"
-									name="type"
-									value="<%=selectedType%>">
+					<input type="hidden" name="type" value="<%=selectedType%>">
 
-								<input
-									type="hidden"
-									name="subType"
-									value="<%=subType%>">
+					<input type="hidden" name="subType" value="<%=subType.getName()%>">
 
-								<button class="subTypeButton">
+					<button class="subTypeButton">
 
-									<%=subType%>
+						<img
+							src="<%=request.getContextPath()%>/images/icons/<%=subType.getIcon()%>"
+							class="categoryIcon">
 
-								</button>
+						<%=subType.getName()%>
 
-							</form>
+					</button>
 
-						<%
+				</form>
+
+				<%
 						}
 						%>
 
-					</div>
+			</div>
 
-				<%
+			<%
 				}
 				else{
 				%>
 
-					<p>Select a Product Type</p>
+			<p>Select a Product Type</p>
 
-				<%
+			<%
 				}
 				%>
 
-			</div>
+		</div>
 
 		<%
 		}
@@ -617,56 +601,53 @@ body {
 		if(selectedSubType != null){
 		%>
 
-			<div class="products">
+		<div class="products">
 
-				<h2>Products</h2>
+			<h2>Products</h2>
 
-				<%
+			<%
 				if(products != null && !products.isEmpty()){
 				%>
 
-					<div class="productGrid">
+			<div class="productGrid">
 
-						<%
+				<%
 						for(Product product : products){
 						%>
-						
-						
-												<div class="productCard" id="productCard<%=product.getId()%>">
 
-							<!-- Product Image -->
-							<div class="product-image">
 
-								<a href="ProductServlet?id=<%=product.getId()%>">
+				<div class="productCard" id="productCard<%=product.getId()%>">
 
-									<img
-										src="<%=request.getContextPath()%>/images/products/<%= (product.getImage() != null && !product.getImage().trim().isEmpty()) ? product.getImage() : "default-placeholder.png" %>"
-										alt="<%=product.getName()%>"
-										style="max-width:90%; height:auto; object-fit:contain;">
+					<!-- Product Image -->
+					<div class="product-image">
 
-								</a>
+						<a href="ProductServlet?id=<%=product.getId()%>"> <img
+							src="<%=request.getContextPath()%>/images/products/<%= (product.getImage() != null && !product.getImage().trim().isEmpty()) ? product.getImage() : "default-placeholder.png" %>"
+							alt="<%=product.getName()%>"
+							style="max-width: 90%; height: auto; object-fit: contain;">
 
-							</div>
+						</a>
 
-							<!-- Product Content -->
-							<div class="productContent">
+					</div>
 
-								<h3>
-									<a href="ProductServlet?id=<%=product.getId()%>">
-										<%=product.getName()%>
-									</a>
-								</h3>
+					<!-- Product Content -->
+					<div class="productContent">
 
-								<p>
-									<b>Price :</b> ₹<%=product.getPrice()%>
-								</p>
+						<h3>
+							<a href="ProductServlet?id=<%=product.getId()%>"> <%=product.getName()%>
+							</a>
+						</h3>
 
-								<p>
-									<b>Available :</b>
-									<%=product.getQuantity()%>
-								</p>
+						<p>
+							<b>Price :</b> ₹<%=product.getPrice()%>
+						</p>
 
-								<%
+						<p>
+							<b>Available :</b>
+							<%=product.getQuantity()%>
+						</p>
+
+						<%
 									String description = product.getDescription();
 									String shortDescription = description;
 
@@ -675,95 +656,72 @@ body {
 									}
 								%>
 
-								<p class="description">
-									<%=shortDescription%>
-								</p>
+						<p class="description">
+							<%=shortDescription%>
+						</p>
 
-								<form action="CheckoutServlet" method="get">
+						<form action="CheckoutServlet" method="post"
+							onsubmit="showLoader()">
 
-									<input
-										type="hidden"
-										name="id"
-										value="<%=product.getId()%>">
+							<input type="hidden" name="id" value="<%=product.getId()%>">
 
-									<button
-										type="submit"
-										class="buyButton">
+							<button type="submit" class="buyButton">Buy Now</button>
 
-										Buy Now
+						</form>
 
-									</button>
+						<!-- Cart Area -->
 
-								</form>
+						<div id="cartArea<%=product.getId()%>">
 
-								<!-- Cart Area -->
-
-								<div id="cartArea<%=product.getId()%>">
-
-									<%
+							<%
 									if(product.getCartQuantity() == 0){
 									%>
 
-										<button
-											type="button"
-											class="cartButton"
-											onclick="addToCart(<%=product.getId()%>)">
+							<button type="button" class="cartButton"
+								onclick="addToCart(<%=product.getId()%>)">Add To Cart</button>
 
-											Add To Cart
-
-										</button>
-
-									<%
+							<%
 									}else{
 									%>
 
-										<div class="quantitySelector">
+							<div class="quantitySelector">
 
-											<button
-												type="button"
-												class="qtyBtn"
-												onclick="updateQuantity(<%=product.getId()%>, 'decrease')">
+								<button type="button" class="qtyBtn"
+									onclick="updateQuantity(<%=product.getId()%>, 'decrease')">
 
-												-
+									-</button>
 
-											</button>
+								<span id="qty<%=product.getId()%>"> <%=product.getCartQuantity()%>
+								</span>
 
-											<span id="qty<%=product.getId()%>">
-												<%=product.getCartQuantity()%>
-											</span>
+								<button type="button" class="qtyBtn"
+									onclick="updateQuantity(<%=product.getId()%>, 'increase')">
 
-											<button
-												type="button"
-												class="qtyBtn"
-												onclick="updateQuantity(<%=product.getId()%>, 'increase')">
-
-												+
-
-											</button>
-
-										</div>
-
-									<%
-									}
-									%>
-
-								</div>
+									+</button>
 
 							</div>
 
+							<%
+									}
+									%>
+
 						</div>
 
-					<%
+					</div>
+
+				</div>
+
+				<%
 					}
 					%>
 
-				</div>
+			</div>
 
 			<%
 			}else{
 			%>
 
-				<h3>No Products Found</h3>
+			<h3>No Products Found</h3>
 
 			<%
 			}
@@ -771,11 +729,77 @@ body {
 
 		</div>
 
-	<%
+		<%
 	}
 	%>
+
+		<script>
 	
-	<script>
+	function updateCart(productId, action){
+
+	    fetch("UpdateCartServlet",{
+
+	        method:"POST",
+
+	        headers:{
+	            "Content-Type":"application/x-www-form-urlencoded"
+	        },
+
+	        body:
+	            "productId=" + productId +
+	            "&action=" + action
+
+	    })
+
+	    .then(response => response.text())
+
+	    .then(data => {
+
+	        data = data.trim();
+
+	        let values = data.split(",");
+
+	        let quantity   = values[0];
+
+	        let cartCount  = values[1];
+
+	        let subtotal   = values[2];
+
+	        let grandTotal = values[3];
+
+	       
+	        // Update floating cart badge
+	        document.getElementById("cartCount").innerText = cartCount;
+
+	        // Update grand total
+	        document.getElementById("grandTotal").innerText = "Rs " + grandTotal;
+
+	        // If product was removed completely
+	        if(action === "remove" || quantity === "0"){
+
+	            document.getElementById("cartCard" + productId).remove();
+
+	            return;
+
+	        }
+
+	        // Update quantity
+	        document.getElementById("qty" + productId).innerText = quantity;
+
+	        // Update subtotal
+	        document.getElementById("subtotal" + productId).innerText = subtotal;
+
+	    })
+
+	    .catch(error => {
+
+	        console.error(error);
+
+	    });
+
+	}
+	
+	
 
 function addToCart(productId){
 
@@ -801,33 +825,17 @@ function addToCart(productId){
         document.getElementById("cartCount").innerText = cartCount;
 
         // Replace Add To Cart button with quantity selector
-        document.getElementById("cartArea"+productId).innerHTML =
+        document.getElementById("cartArea" + productId).innerHTML =
+    '<div class="quantitySelector">' +
 
-        `
-        <div class="quantitySelector">
+        '<button class="qtyBtn" type="button" onclick="updateQuantity(' + productId + ', \'decrease\')">-</button>' +
 
-            <button
-                type="button"
-                class="qtyBtn"
-                onclick="updateQuantity(${productId},'decrease')">
+        '<span id="qty' + productId + '">1</span>' +
 
-                -
+        '<button class="qtyBtn" type="button" onclick="updateQuantity(' + productId + ', \'increase\')">+</button>' +
 
-            </button>
-
-            <span id="qty${productId}">1</span>
-
-            <button
-                type="button"
-                class="qtyBtn"
-                onclick="updateQuantity(${productId},'increase')">
-
-                +
-
-            </button>
-
-        </div>
-        `;
+    '</div>';        
+        console.log(document.getElementById("cartArea" + productId).innerHTML);
 
     })
 
@@ -841,67 +849,64 @@ function addToCart(productId){
 
 
 
-function updateQuantity(productId,action){
+function updateQuantity(productId, action) {
 
-    fetch("UpdateCartServlet",{
+    fetch("UpdateCartServlet", {
 
-        method:"POST",
+        method: "POST",
 
-        headers:{
-            "Content-Type":"application/x-www-form-urlencoded"
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
         },
 
         body:
-        "productId="+productId+
-        "&action="+action
+            "productId=" + productId +
+            "&action=" + action
 
     })
 
-    .then(response=>response.text())
+    .then(response => response.text())
 
-    .then(quantity=>{
+    .then(data => {
 
-        quantity = quantity.trim();
+        data = data.trim();
 
-        if(quantity==="0"){
+        let values = data.split(",");
 
-            document.getElementById("cartArea"+productId).innerHTML =
+        let quantity = values[0];
 
-            `
-            <button
-                type="button"
-                class="cartButton"
-                onclick="addToCart(${productId})">
+        let cartCount = values[1];
 
-                Add To Cart
+        // Update floating cart count
+        document.getElementById("cartCount").innerText = cartCount;
 
-            </button>
-            `;
+        if (quantity === "0") {
 
-        }
-        else{
+            document.getElementById("cartArea" + productId).innerHTML =
+                '<button type="button" class="cartButton" onclick="addToCart(' + productId + ')">' +
+                'Add To Cart' +
+                '</button>';
 
-            document.getElementById("qty"+productId).innerText = quantity;
+        } else {
+
+            document.getElementById("qty" + productId).innerText = quantity;
 
         }
 
     })
 
-    .catch(error=>{
+    .catch(error => {
 
         console.error(error);
 
     });
 
 }
-
 </script>
-
 </body>
 
 </html>
 
 
 
-</body>
-</html>
+

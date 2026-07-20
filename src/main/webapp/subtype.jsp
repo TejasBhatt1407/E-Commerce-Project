@@ -14,9 +14,18 @@ List<String> subTypes = (List<String>) request.getAttribute("subTypes");
 <head>
 <meta charset="UTF-8">
 <title><%=type%></title>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
+
 </head>
 
 <body>
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
 	<h1><%=type%></h1>
 	<h2>Select a Category</h2>
 	<table border="1" cellpadding="10">
@@ -29,7 +38,7 @@ List<String> subTypes = (List<String>) request.getAttribute("subTypes");
 		%>
 		<tr>
 			<td>
-				<form action="SubTypeServlet" method="get">
+				<form action="SubTypeServlet" method="get" onsubmit="showLoader()">
 					<input type="hidden" name="type" value="<%=type%>"> <input
 						type="hidden" name="subType" value="<%=subType%>">
 					<button type="submit">   
@@ -50,7 +59,7 @@ List<String> subTypes = (List<String>) request.getAttribute("subTypes");
 %>
 	</table>
 	<br>
-	<form action="HomeServlet" method="get">
+	<form action="HomeServlet" method="get" onsubmit="showLoader()">
 		<button type="submit">Back</button>
 	</form>
 </body>

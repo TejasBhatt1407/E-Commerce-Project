@@ -60,9 +60,11 @@ public class EmailUtility {
 
         catch(Exception e) {
 
-            e.printStackTrace();
+//            e.printStackTrace();
 
-            return false;
+        	throw new RuntimeException(e);
+        	
+           // return false;
 
         }
 

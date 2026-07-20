@@ -121,8 +121,8 @@ public class CartDAO {
 
 	            cartItems.add(cart);
 			}
-		}catch (Exception e) {
-			e.printStackTrace();
+		}catch(Exception e){
+		    throw new RuntimeException(e);
 		}
 		return cartItems;
 	};
@@ -138,11 +138,11 @@ public class CartDAO {
 
 		        return ps.executeUpdate() > 0;
 
-		    } catch (Exception e) {
-		        e.printStackTrace();
+		    } catch(Exception e){
+		        throw new RuntimeException(e);
 		    }
 
-		    return false;
+		//    return false;
 		};
 	
 
@@ -183,8 +183,8 @@ public class CartDAO {
 	            return ps.executeUpdate() > 0;
 	        }
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	    } catch(Exception e){
+	        throw new RuntimeException(e);
 	    }
 
 	    return false;
@@ -202,11 +202,11 @@ public class CartDAO {
 
 	        return ps.executeUpdate() > 0;
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	    } catch(Exception e){
+	        throw new RuntimeException(e);
 	    }
 
-	    return false;
+	 //   return false;
 	};
 
 	public double getCartTotal(int userId) {
@@ -234,8 +234,8 @@ public class CartDAO {
 
 	        }
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	    } catch(Exception e){
+	        throw new RuntimeException(e);
 	    }
 
 	    return total;
@@ -263,11 +263,11 @@ public class CartDAO {
 
 	        return ps.executeUpdate() > 0;
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	    } catch(Exception e){
+	        throw new RuntimeException(e);
 	    }
 
-	    return false;		
+	//    return false;		
 	};
 	
 	
@@ -311,11 +311,11 @@ public class CartDAO {
                 return ips.executeUpdate() > 0;
             }
 
-        } catch(Exception e) {
-            e.printStackTrace();
+        } catch(Exception e){
+            throw new RuntimeException(e);
         }
 
-        return false;
+     //   return false;
     }
     public int getCartCount(int userId) {
 
@@ -332,8 +332,8 @@ public class CartDAO {
                 return rs.getInt(1);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(Exception e){
+            throw new RuntimeException(e);
         }
 
         return 0;
@@ -355,8 +355,8 @@ public class CartDAO {
                 return rs.getInt("quantity");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(Exception e){
+            throw new RuntimeException(e);
         }
 
         return 0;

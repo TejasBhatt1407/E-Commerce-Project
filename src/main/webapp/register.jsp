@@ -122,9 +122,17 @@ button[type="submit"]:hover {
 	background-color: #f9f9f9; /* Default fallback */
 }
 </style>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/loader.css">
+<script src="${pageContext.request.contextPath}/js/loader.js"></script>
+
 </head>
 
 <body>
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
 
 	<div class="register-container">
 		<h2>User Registration</h2>
@@ -149,7 +157,7 @@ button[type="submit"]:hover {
 		}
 		%>
 
-		<form id="registerForm" action="RegisterServlet" method="post">
+		<form id="registerForm" action="RegisterServlet" method="post" onsubmit="showLoader()">
 			<div class="form-group">
 				<label for="name">Name:</label> <input type="text" id="name"
 					name="name" placeholder="Enter Your Name" required>

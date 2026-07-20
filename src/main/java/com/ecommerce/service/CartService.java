@@ -12,7 +12,6 @@ public class CartService {
     public boolean addToCart(int userId, int productId) {
 
         return cartDAO.addToCart(userId, productId);
-
     }
     
     public double getCartTotal(int userId) {

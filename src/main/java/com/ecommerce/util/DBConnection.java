@@ -16,10 +16,10 @@ public static Connection getConnection() {
 		System.out.println("Connection successful");
 	} catch (ClassNotFoundException e) {
 		System.out.println("JDBC Driver Not Found!");
-        e.printStackTrace();
+		throw new RuntimeException(e);
 	} catch (SQLException e){
 		System.out.println("Unable to Connect to Database!");
-        e.printStackTrace();
+		throw new RuntimeException(e);
 	}
 	
 	return connection;

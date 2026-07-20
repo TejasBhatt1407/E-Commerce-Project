@@ -23,9 +23,12 @@ public class UserDAO {
 			if (rs.next()) { // internal reading cursor,checks if next row exists
 				return rs.getInt(1) > 0; // gets the data and compares it value
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-
+		} 
+//		catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		catch(Exception e){
+		    throw new RuntimeException(e);
 		}
 		return false;
 	}
@@ -38,8 +41,12 @@ public class UserDAO {
 			if (rs.next()) {
 				return rs.getInt(1) > 0;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} 
+//		catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		catch(Exception e){
+		    throw new RuntimeException(e);
 		}
 		return false;
 	}
@@ -54,10 +61,14 @@ public class UserDAO {
 
 			int rows = ps.executeUpdate(); // UpdateTheDataAndReturnNothing
 			return rows > 0;
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} 
+//		catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		catch(Exception e){
+		    throw new RuntimeException(e);
 		}
-		return false;
+	//	return false;
 	}
 
 	public User loginUser(String email, String password) {
@@ -84,8 +95,12 @@ public class UserDAO {
 				return user;
 			}
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} 
+//		catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		catch(Exception e){
+		    throw new RuntimeException(e);
 		}
 
 		return null;
@@ -117,8 +132,12 @@ public class UserDAO {
 	            // Don't set password
 	        }
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	    } 
+//	    catch (Exception e) {
+//	        e.printStackTrace();
+//	    }
+	    catch(Exception e){
+	        throw new RuntimeException(e);
 	    }
 
 	    return user;
@@ -137,12 +156,15 @@ public class UserDAO {
 
 	        return ps.executeUpdate()>0;
 	    }
-	    catch(Exception e)
-	    {
-	        e.printStackTrace();
+//	    catch(Exception e)
+//	    {
+//	        e.printStackTrace();
+//	    }
+	    catch(Exception e){
+	        throw new RuntimeException(e);
 	    }
 
-	    return false;
+	   // return false;
 	}
 	
 	
