@@ -234,8 +234,10 @@ textarea {
 
 		</form>
 
-	</div>
+
 <a href=CartServlet class="back-btn">Previous</a>
+
+	</div>
 
 </body>
 

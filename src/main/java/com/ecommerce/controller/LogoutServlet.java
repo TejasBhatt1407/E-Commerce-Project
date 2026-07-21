@@ -26,21 +26,24 @@ public class LogoutServlet extends HttpServlet {
 
 		if (session != null) {
 
-			String sessionId = session.getId();
+			Integer userId = (Integer) session.getAttribute("loggedInUserId");
 
 			try (Connection con = DBConnection.getConnection();
-					PreparedStatement ps = con.prepareStatement("DELETE FROM cart WHERE session_id = ?")) {
+			     PreparedStatement ps = con.prepareStatement(
+			             "DELETE FROM cart WHERE user_id = ?")) {
 
-				ps.setString(1, sessionId);
-				ps.executeUpdate();
+			    ps.setInt(1, userId);
+			    ps.executeUpdate();
 
 			} catch (Exception e) {
 			    request.setAttribute("jakarta.servlet.error.exception", e);
 			    request.getRequestDispatcher("error.jsp").forward(request, response);
+			    return;
 			}
 			session.setAttribute("loggedInUser", null);
 			session.setAttribute("loggedInUserName", null);
 			session.setAttribute("loggedInUserId",null);
+			
 			
 			// Destroy the session
 			session.invalidate();
@@ -48,6 +51,6 @@ public class LogoutServlet extends HttpServlet {
 
 		// Redirect to login page after logout
 		response.sendRedirect("index.jsp");
-		return;
+		//return;
 	}
 }

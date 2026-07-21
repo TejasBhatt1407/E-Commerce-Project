@@ -18,76 +18,83 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/HomeServlet")
 public class HomeServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private ProductService productService = new ProductService();
+	private ProductService productService = new ProductService();
 
-    @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
- 
-        if (session==null || session.getAttribute("loggedInUserId")==null) {
-        	response.sendRedirect("index.jsp");
-        }
-        
-        int userId = (Integer) session.getAttribute("loggedInUserId");
+		HttpSession session = request.getSession(false);
 
-        
-        
-        // Load all product types
-        List<Category> types = productService.getAllTypes();
-        request.setAttribute("types", types);
+		if (session == null || session.getAttribute("loggedInUserId") == null) {
+			response.sendRedirect("index.jsp");
+		}
 
-        
-        
-        // Selected values from URL
-        String type = request.getParameter("type");
-        String subType = request.getParameter("subType");
+		int userId = (Integer) session.getAttribute("loggedInUserId");
 
-        // If no type selected, use first type
-        if ((type == null || type.trim().isEmpty()) && !types.isEmpty()) {
-            type = types.get(0).getName();
-        }
+		// Load all product types
+		List<Category> types = productService.getAllTypes();
+		request.setAttribute("types", types);
 
-        // Load subtypes of selected/default type
-        List<Category> subTypes = productService.getSubTypes(type);
+		// Selected values from URL
+		String type = request.getParameter("type");
+		String subType = request.getParameter("subType");
+		String search = request.getParameter("search");
+		
+		boolean isSearch=search!=null && !search.trim().isEmpty();
+		
+		request.setAttribute("isSearch", isSearch);
+		request.setAttribute("search", search);
 
-        // If no subtype selected, use first subtype
-        if ((subType == null || subType.trim().isEmpty()) && !subTypes.isEmpty()) {
-            subType = subTypes.get(0).getName();
-        }
+		// If no type selected, use first type
+		if ((type == null || type.trim().isEmpty()) && !types.isEmpty()) {
+			type = types.get(0).getName();
+		}
 
-        // Send selected values to JSP
-        request.setAttribute("selectedType", type);
-        request.setAttribute("subTypes", subTypes);
-        request.setAttribute("selectedSubType", subType);
+		// Load subtypes of selected/default type
+		List<Category> subTypes = productService.getSubTypes(type);
 
-        // Load products only if both values exist
-        if (type != null && subType != null) {
+		// If no subtype selected, use first subtype
+		if ((subType == null || subType.trim().isEmpty()) && !subTypes.isEmpty()) {
+			subType = subTypes.get(0).getName();
+		}
 
-            List<Product> products =
-                    productService.getProducts(userId, type, subType);
+		// Send selected values to JSP
+		request.setAttribute("selectedType", type);
+		request.setAttribute("subTypes", subTypes);
+		request.setAttribute("selectedSubType", subType);
 
-            for (Product product : products) {
-                System.out.println(product);
-            }
+		// Load products
+		if (search != null && !search.trim().isEmpty()) {
 
-            request.setAttribute("products", products);
-        }
-        
-        CartService cartService = new CartService();
+			List<Product> products = productService.searchProducts(userId, search.trim());
 
-        int cartCount = cartService.getCartCount(userId);
+			for (Product product : products) {
+				System.out.println(product);
+			}
 
-        request.setAttribute("cartCount", cartCount);
+			request.setAttribute("products", products);
 
-        request.getRequestDispatcher("home.jsp")
-               .forward(request, response);
-    }
-    
-    
-    
+		} else if (type != null && subType != null) {
+
+			List<Product> products = productService.getProducts(userId, type, subType);
+
+			for (Product product : products) {
+				System.out.println(product);
+			}
+
+			request.setAttribute("products", products);
+		}
+
+		CartService cartService = new CartService();
+
+		int cartCount = cartService.getCartCount(userId);
+
+		request.setAttribute("cartCount", cartCount);
+
+		request.getRequestDispatcher("home.jsp").forward(request, response);
+	}
+
 }

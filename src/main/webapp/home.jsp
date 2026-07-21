@@ -16,7 +16,12 @@ List<Category> subTypes = (List<Category>) request.getAttribute("subTypes");
 List<Product> products = (List<Product>) request.getAttribute("products");
 String selectedType = (String) request.getAttribute("selectedType");
 String selectedSubType = (String) request.getAttribute("selectedSubType");
+Boolean isSearchObj = (Boolean) request.getAttribute("isSearch");
+boolean isSearch = isSearchObj != null && isSearchObj;
+
+String search = (String) request.getAttribute("search");
 %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -113,6 +118,7 @@ body {
 .main {
 	padding: 25px;
 }
+
 /* ================= HORIZONTAL PRODUCT TYPES ================= */
 .productTypeSection {
 	background: white;
@@ -121,36 +127,55 @@ body {
 	margin-bottom: 25px;
 }
 
-.productTypeContainer {
-	overflow-x: auto;
-	overflow-y: hidden;
-	white-space: nowrap;
-	padding-bottom: 10px;
+.productTypeSection h2 {
+	margin-bottom: 15px;
 }
 
-.productTypeButtons {
+.typeWrapper {
 	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.typeContainer {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 10px;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 5px 0;
+}
+
+
+.productTypeButtons {
+	display:flex;
 	flex-wrap: nowrap;
 	gap: 12px;
-	width: max-content;
 }
 
 .productTypeButtons form {
-	flex-shrink: 0;
+	flex: 0 0 auto;
 }
 
 .typeButton {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	padding: 12px 25px;
 	background: #2563eb;
 	color: white;
 	border: none;
 	border-radius: 6px;
 	cursor: pointer;
+	flex: 0 0 auto;
 }
 
 .typeButton:hover {
 	background: #1d4ed8;
 }
+
 /* ================= SUB TYPES ================= */
 .subTypeSection {
 	background: white;
@@ -163,37 +188,59 @@ body {
 	margin-bottom: 15px;
 }
 
-.subTypeButtons {
+.subWrapper {
 	display: flex;
-	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+}
+
+.subTypesContainer {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    white-space: nowrap;
+    padding: 5px 0;
+}
+
+.subTypeButtons {
+	display: inline-flex;
+	flex-wrap: nowrap;
 	gap: 12px;
 }
 
+.subTypeButtons form {
+	flex: 0 0 auto;
+}
+
 .subTypeButton {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	padding: 10px 20px;
 	background: #10b981;
 	color: white;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
+	flex: 0 0 auto;
 }
 
 .subTypeButton:hover {
 	background: #059669;
 }
+
+.typeButton,
+.subTypeButton {
+    flex: 0 0 auto;
+}
 /* ================= PRODUCTS ================= */
 .productGrid {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 20px; <!--
-	margin-top: 20px;
-	-->
-}
-
-.productGrid {
-	display: flex;
-	flex-wrap: wrap;
 	gap: 20px;
+	margin-top: 20px;
 }
 
 .productCard {
@@ -243,8 +290,8 @@ body {
 	padding: 15px;
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
 	flex: 1;
+	row-gap: 0px;
 }
 
 .product-image img {
@@ -256,16 +303,35 @@ body {
 }
 
 .description {
-	margin: 8px 0;
-	color: #444;
-	line-height: 1.4;
-	min-height: 40px;
+	margin: 12px 0 20px;
+	height: 48px;
+	line-height: 24px;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+.productTitle {
+	margin: 0 0 18px 0; height : 56px;
+	line-height: 28px;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	height: 56px;
+}
+
+.productTitle a {
+	color: #1f2937;
+	text-decoration: none;
 }
 
 .buyButton {
 	width: 100%;
 	padding: 8px 18px;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
+	margin-top: 8px;
 	background: #10b981;
 	color: white;
 	border: none;
@@ -287,6 +353,7 @@ body {
 	border-radius: 5px;
 	cursor: pointer;
 	font-size: 14px;
+	margin-top: 10px;
 }
 
 .cartButton:hover {
@@ -342,7 +409,6 @@ body {
 	display: none;
 	position: absolute;
 	right: 0;
-	/* Aligns the dropdown menu to the right side of the button */
 	background-color: #ffffff;
 	min-width: 160px;
 	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
@@ -353,14 +419,18 @@ body {
 	overflow: hidden;
 }
 
+/* Toggle actions on click (when checkbox is checked) */
 .dropdown-checkbox:checked ~ .dropdown-trigger-btn {
 	background-color: #1d4ed8;
 }
 
 .dropdown-checkbox:checked ~ .dropdown-content {
 	display: block;
-	/* Individual links/buttons inside the dropdown */ . dropdown-item {
-	color : #374151;
+}
+
+/* Individual links/buttons inside the dropdown */
+.dropdown-content a, .dropdown-content button, .dropdown-item {
+	color: #374151;
 	padding: 12px 16px;
 	text-decoration: none;
 	display: block;
@@ -374,14 +444,15 @@ body {
 }
 
 /* Hover effects for individual items */
-.dropdown-item:hover {
+.dropdown-item:hover, .dropdown-content a:hover, .dropdown-content button:hover
+	{
 	background-color: #f3f4f6;
 	color: #111827;
 }
 
 /* Custom design for the inside logout option */
 .dropdown-item.logout-btn {
-	color: #dc2626; /* Making the logout option stand out in red */
+	color: #dc2626;
 }
 
 .dropdown-item.logout-btn:hover {
@@ -395,14 +466,82 @@ body {
 	margin: 4px 0;
 }
 
-/* CRITICAL: Shows the dropdown menu when hovering over the parent wrapper */
-.user-dropdown:hover .dropdown-content {
-	display: block; . categoryIcon { width : 24px;
+/* Icon support inside links */
+.categoryIcon {
+	width: 24px;
 	height: 24px;
 	margin-right: 8px;
 	vertical-align: middle;
 }
+
+.typeWrapper, .subWrapper {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
+
+.typeContainer,
+.subContainer {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.arrow {
+	width: 40px;
+	height: 40px;
+	border: none;
+	border-radius: 50%;
+	background: #295ddb;
+	color: white;
+	font-size: 20px;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+.arrow:hover {
+	background: #1d47aa;
+}
+
+.typeContainer::-webkit-scrollbar, .subContainer::-webkit-scrollbar {
+	display: none;
+}
+
+.typeContainer, .subContainer {
+	scrollbar-width: none;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Spacing between spinner and text */
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #ddd;
+    border-top: 6px solid #007bff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.loader-text {
+    font-family: sans-serif;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    font-weight: 500;
+}
+
+.hiddensearch{
+	display:none;
+}
+
 </style>
 
 <link rel="stylesheet"
@@ -415,7 +554,10 @@ body {
 <body>
 
 	<div id="loader">
+	<div class="loader-content">
 		<div class="spinner"></div>
+		<p class="loader-text">Loading...</p>
+		</div>
 	</div>
 
 	<a href="CartServlet" class="floatingCart"> 🛒 <span id="cartCount">${cartCount}</span>
@@ -425,14 +567,15 @@ body {
 
 		<div class="logo">
 			<a href="HomeServlet" style="text-decoration: none; color: inherit;">
-				GalaXy 8uy </a>
+				Galaxy Buy </a>
 		</div>
 
 		<div class="rightHeader">
 
 			<form action="HomeServlet" method="get" onsubmit="showLoader()">
 				<input class="searchBar" type="text" name="search"
-					placeholder="Search Products...">
+					placeholder="Search Products"
+					value="<%= search!=null ? search:""%>">
 			</form>
 
 			<span>Welcome, <%=userName%></span>
@@ -470,439 +613,327 @@ body {
 
 	<div class="main">
 
-		<!-- Product Types -->
 
-		<div class="productTypeSection">
+		<!-- Product Types -->
+		<% if (!isSearch) { %>
+<div class="productTypeSection">
 
 			<h2>Product Types</h2>
 
-			<div class="productTypeContainer">
+				<div class="typeContainer" id="typeContainer">
 
-				<div class="productTypeButtons">
+					<div class="productTypeButtons">
 
-					<%
-					if(types != null){
-						for(Category type : types){
-						%>
+						<%
+                        if(types != null){
+                            for(Category type : types){
+                        %>
 
-					<form action="HomeServlet" method="get" onsubmit="showLoader()">
+						<form action="HomeServlet" method="get" onsubmit="showLoader()">
 
-						<!-- CHANGED: Use category name -->
-						<input type="hidden" name="type" value="<%=type.getName()%>">
+							<input type="hidden" name="type" value="<%=type.getName()%>">
 
-						<button class="typeButton">
+							<button class="typeButton">
 
-							<!-- NEW: Display icon -->
-							<img
-								src="<%=request.getContextPath()%>/images/icons/<%=type.getIcon()%>"
-								class="categoryIcon">
+								<img
+									src="<%=request.getContextPath()%>/images/icons/<%=type.getIcon()%>"
+									class="categoryIcon">
 
-							<!-- CHANGED: Display category name -->
-							<%=type.getName()%>
+								<%=type.getName()%>
 
-						</button>
+							</button>
 
-					</form>
+						</form>
 
-					<%
-						}
-					}
-					%>
+						<%
+                            }
+                        }
+                        %>
+
+					</div>
 
 				</div>
 
-			</div>
-
 		</div>
+		<% } %>
 
 		<!-- Default Screen -->
-
 		<%
 		if(selectedType == null){
 		%>
-
 		<div class="products">
-
 			<h2>Featured Products</h2>
-
 			<p style="margin-top: 15px; color: #666;">Please select a product
 				type above to explore categories.</p>
-
 		</div>
-
 		<%
 		}
 		%>
 
 		<!-- Sub Types -->
-
 		<%
 		if(selectedType != null){
 		%>
-
-		<div class="subTypeSection">
-
+		
+		<% if (!isSearch) { %>
+		<div class="subTypeSection ">
 			<h2>Sub Types</h2>
-
-			<%
-				if(subTypes != null){
-				%>
-
-			<div class="subTypeButtons">
-
-				<%
-						for(Category subType : subTypes){
-						%>
-
-				<form action="HomeServlet" method="get" onsubmit="showLoader()">
-
-					<input type="hidden" name="type" value="<%=selectedType%>">
-
-					<input type="hidden" name="subType" value="<%=subType.getName()%>">
-
-					<button class="subTypeButton">
-
-						<img
-							src="<%=request.getContextPath()%>/images/icons/<%=subType.getIcon()%>"
-							class="categoryIcon">
-
-						<%=subType.getName()%>
-
-					</button>
-
-				</form>
-
-				<%
-						}
-						%>
-
+			<div class="subWrapper">
+				<div class="subContainer" id="subContainer">
+					<%
+                    if(subTypes != null){
+                    %>
+					<div class="subTypeButtons">
+						<%
+                        for(Category subType : subTypes){
+                        %>
+						<form action="HomeServlet" method="get" onsubmit="showLoader()">
+							<input type="hidden" name="type" value="<%=selectedType%>">
+							<input type="hidden" name="subType"
+								value="<%=subType.getName()%>">
+							<button class="subTypeButton">
+								<img
+									src="<%=request.getContextPath()%>/images/icons/<%=subType.getIcon()%>"
+									class="categoryIcon">
+								<%=subType.getName()%>
+							</button>
+						</form>
+						<%
+                        }
+                        %>
+					</div>
+					<%
+                    } else {
+                    %>
+					<p>Select a Product Type</p>
+					<%
+                    }
+                    %>
+				</div>
 			</div>
-
-			<%
-				}
-				else{
-				%>
-
-			<p>Select a Product Type</p>
-
-			<%
-				}
-				%>
-
 		</div>
-
-		<%
-		}
-		%>
+		<% } %>
 
 		<!-- Products -->
-
 		<%
 		if(selectedSubType != null){
 		%>
-
 		<div class="products">
-
 			<h2>Products</h2>
-
 			<%
-				if(products != null && !products.isEmpty()){
-				%>
-
+			if(products != null && !products.isEmpty()){
+			%>
 			<div class="productGrid">
-
 				<%
-						for(Product product : products){
-						%>
-
-
+				for(Product product : products){
+				%>
 				<div class="productCard" id="productCard<%=product.getId()%>">
-
 					<!-- Product Image -->
 					<div class="product-image">
-
 						<a href="ProductServlet?id=<%=product.getId()%>"> <img
 							src="<%=request.getContextPath()%>/images/products/<%= (product.getImage() != null && !product.getImage().trim().isEmpty()) ? product.getImage() : "default-placeholder.png" %>"
 							alt="<%=product.getName()%>"
 							style="max-width: 90%; height: auto; object-fit: contain;">
-
 						</a>
-
 					</div>
-
 					<!-- Product Content -->
 					<div class="productContent">
-
-						<h3>
+						<h3 class="productTitle">
 							<a href="ProductServlet?id=<%=product.getId()%>"> <%=product.getName()%>
 							</a>
 						</h3>
-
-						<p>
+						<p class="info">
 							<b>Price :</b> ₹<%=product.getPrice()%>
 						</p>
-
-						<p>
+						<p class="info">
 							<b>Available :</b>
 							<%=product.getQuantity()%>
 						</p>
-
 						<%
-									String description = product.getDescription();
-									String shortDescription = description;
-
-									if(description != null && description.length() > 60){
-										shortDescription = description.substring(0,60) + "...";
-									}
-								%>
-
+						String description = product.getDescription();
+						String shortDescription = description;
+						if(description != null && description.length() > 60){
+							shortDescription = description.substring(0,60) + "...";
+						}
+						%>
 						<p class="description">
 							<%=shortDescription%>
 						</p>
-
 						<form action="CheckoutServlet" method="post"
 							onsubmit="showLoader()">
-
 							<input type="hidden" name="id" value="<%=product.getId()%>">
-
 							<button type="submit" class="buyButton">Buy Now</button>
-
 						</form>
-
 						<!-- Cart Area -->
-
 						<div id="cartArea<%=product.getId()%>">
-
 							<%
-									if(product.getCartQuantity() == 0){
-									%>
-
+							if(product.getCartQuantity() == 0){
+							%>
 							<button type="button" class="cartButton"
 								onclick="addToCart(<%=product.getId()%>)">Add To Cart</button>
-
 							<%
-									}else{
-									%>
-
+							} else {
+							%>
 							<div class="quantitySelector">
-
 								<button type="button" class="qtyBtn"
 									onclick="updateQuantity(<%=product.getId()%>, 'decrease')">
-
 									-</button>
-
 								<span id="qty<%=product.getId()%>"> <%=product.getCartQuantity()%>
 								</span>
-
 								<button type="button" class="qtyBtn"
 									onclick="updateQuantity(<%=product.getId()%>, 'increase')">
-
 									+</button>
-
 							</div>
-
 							<%
-									}
-									%>
-
+							}
+							%>
 						</div>
-
 					</div>
-
 				</div>
-
 				<%
-					}
-					%>
-
+				}
+				%>
 			</div>
-
 			<%
-			}else{
+			} else {
 			%>
-
 			<h3>No Products Found</h3>
-
 			<%
 			}
 			%>
-
 		</div>
+		<%
+		} // Closes: if(selectedSubType != null)
+		%>
 
 		<%
-	}
+	} // Closes: if(selectedType != null)
 	%>
 
-		<script>
-	
-	function updateCart(productId, action){
+	</div>
 
-	    fetch("UpdateCartServlet",{
+	<script>
 
-	        method:"POST",
-
-	        headers:{
-	            "Content-Type":"application/x-www-form-urlencoded"
+	function updateCart(productId, action) {
+	    fetch("UpdateCartServlet", {
+	        method: "POST",
+	        headers: {
+	            "Content-Type": "application/x-www-form-urlencoded"
 	        },
-
-	        body:
-	            "productId=" + productId +
-	            "&action=" + action
-
+	        body: "productId=" + productId + "&action=" + action
 	    })
-
 	    .then(response => response.text())
-
 	    .then(data => {
-
+	        if (!data) return;
 	        data = data.trim();
-
 	        let values = data.split(",");
+	        
+	        // Ensure the server sent back all 4 required values
+	        if (values.length < 4) return;
 
 	        let quantity   = values[0];
-
 	        let cartCount  = values[1];
-
 	        let subtotal   = values[2];
-
 	        let grandTotal = values[3];
 
-	       
-	        // Update floating cart badge
-	        document.getElementById("cartCount").innerText = cartCount;
+	        // Safely update floating cart badge if it exists
+	        let cartCountEl = document.getElementById("cartCount");
+	        if (cartCountEl) cartCountEl.innerText = cartCount;
 
-	        // Update grand total
-	        document.getElementById("grandTotal").innerText = "Rs " + grandTotal;
+	        // Safely update grand total if it exists (only on Cart page)
+	        let grandTotalEl = document.getElementById("grandTotal");
+	        if (grandTotalEl) grandTotalEl.innerText = "Rs " + grandTotal;
 
-	        // If product was removed completely
-	        if(action === "remove" || quantity === "0"){
-
-	            document.getElementById("cartCard" + productId).remove();
-
+	        // Safely remove the element if quantity drops to 0
+	        if (action === "remove" || quantity === "0") {
+	            let cartCard = document.getElementById("cartCard" + productId);
+	            if (cartCard) cartCard.remove();
 	            return;
-
 	        }
 
-	        // Update quantity
-	        document.getElementById("qty" + productId).innerText = quantity;
+	        // Safely update quantity text
+	        let qtyEl = document.getElementById("qty" + productId);
+	        if (qtyEl) qtyEl.innerText = quantity;
 
-	        // Update subtotal
-	        document.getElementById("subtotal" + productId).innerText = subtotal;
-
+	        // Safely update subtotal text
+	        let subtotalEl = document.getElementById("subtotal" + productId);
+	        if (subtotalEl) subtotalEl.innerText = subtotal;
 	    })
+	    .catch(error => console.error("Error in updateCart:", error));
+	}	
 
-	    .catch(error => {
+	function addToCart(productId) {
+	    fetch("AddToCartServlet", {
+	        method: "POST",
+	        headers: {
+	            "Content-Type": "application/x-www-form-urlencoded"
+	        },
+	        body: "productId=" + productId
+	    })
+	    .then(response => response.text())
+	    .then(cartCount => {
+	        if (!cartCount) return;
+	        cartCount = cartCount.trim();
 
-	        console.error(error);
+	        // Safely update floating cart count
+	        let cartCountEl = document.getElementById("cartCount");
+	        if (cartCountEl) cartCountEl.innerText = cartCount;
 
-	    });
+	        // Safely replace Add To Cart button with quantity selector
+	        let cartArea = document.getElementById("cartArea" + productId);
+	        if (cartArea) {
+	            cartArea.innerHTML =
+	                '<div class="quantitySelector">' +
+	                    '<button class="qtyBtn" type="button" onclick="updateQuantity(' + productId + ', \'decrease\')">-</button>' +
+	                    '<span id="qty' + productId + '">1</span>' +
+	                    '<button class="qtyBtn" type="button" onclick="updateQuantity(' + productId + ', \'increase\')">+</button>' +
+	                '</div>';        
+	        }
+	    })
+	    .catch(error => console.error("Error in addToCart:", error));
+	}
 
+	function updateQuantity(productId, action) {
+	    fetch("UpdateCartServlet", {
+	        method: "POST",
+	        headers: {
+	            "Content-Type": "application/x-www-form-urlencoded"
+	        },
+	        body: "productId=" + productId + "&action=" + action
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	        if (!data) return;
+	        data = data.trim();
+	        let values = data.split(",");
+	        
+	        if (values.length < 2) return;
+
+	        let quantity = values[0];
+	        let cartCount = values[1];
+
+	        // Safely update floating cart count
+	        let cartCountEl = document.getElementById("cartCount");
+	        if (cartCountEl) cartCountEl.innerText = cartCount;
+
+	        let cartArea = document.getElementById("cartArea" + productId);
+	        if (quantity === "0") {
+	            if (cartArea) {
+	                cartArea.innerHTML =
+	                    '<button type="button" class="cartButton" onclick="addToCart(' + productId + ')">' +
+	                    'Add To Cart' +
+	                    '</button>';
+	            }
+	        } else {
+	            let qtyEl = document.getElementById("qty" + productId);
+	            if (qtyEl) qtyEl.innerText = quantity;
+	        }
+	    })
+	    .catch(error => console.error("Error in updateQuantity:", error));
 	}
 	
-	
-
-function addToCart(productId){
-
-    fetch("AddToCartServlet",{
-
-        method:"POST",
-
-        headers:{
-            "Content-Type":"application/x-www-form-urlencoded"
-        },
-
-        body:"productId="+productId
-
-    })
-
-    .then(response=>response.text())
-
-    .then(cartCount=>{
-
-        cartCount = cartCount.trim();
-
-        // Update floating cart count
-        document.getElementById("cartCount").innerText = cartCount;
-
-        // Replace Add To Cart button with quantity selector
-        document.getElementById("cartArea" + productId).innerHTML =
-    '<div class="quantitySelector">' +
-
-        '<button class="qtyBtn" type="button" onclick="updateQuantity(' + productId + ', \'decrease\')">-</button>' +
-
-        '<span id="qty' + productId + '">1</span>' +
-
-        '<button class="qtyBtn" type="button" onclick="updateQuantity(' + productId + ', \'increase\')">+</button>' +
-
-    '</div>';        
-        console.log(document.getElementById("cartArea" + productId).innerHTML);
-
-    })
-
-    .catch(error=>{
-
-        console.error(error);
-
-    });
-
-}
-
-
-
-function updateQuantity(productId, action) {
-
-    fetch("UpdateCartServlet", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-
-        body:
-            "productId=" + productId +
-            "&action=" + action
-
-    })
-
-    .then(response => response.text())
-
-    .then(data => {
-
-        data = data.trim();
-
-        let values = data.split(",");
-
-        let quantity = values[0];
-
-        let cartCount = values[1];
-
-        // Update floating cart count
-        document.getElementById("cartCount").innerText = cartCount;
-
-        if (quantity === "0") {
-
-            document.getElementById("cartArea" + productId).innerHTML =
-                '<button type="button" class="cartButton" onclick="addToCart(' + productId + ')">' +
-                'Add To Cart' +
-                '</button>';
-
-        } else {
-
-            document.getElementById("qty" + productId).innerText = quantity;
-
-        }
-
-    })
-
-    .catch(error => {
-
-        console.error(error);
-
-    });
-
-}
 </script>
+
 </body>
 
 </html>

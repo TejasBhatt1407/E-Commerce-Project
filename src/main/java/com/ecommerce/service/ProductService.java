@@ -16,7 +16,11 @@ public class ProductService {
 
     }
     
-    
+    public List<Product> searchProducts(int userId, String search){
+
+        return new ProductDAO().searchProducts(userId, search);
+
+    }
     
     public List<Category> getSubTypes(String type){
     	ProductDAO dao=new ProductDAO();

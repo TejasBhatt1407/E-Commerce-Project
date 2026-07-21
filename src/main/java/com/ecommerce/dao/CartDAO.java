@@ -128,7 +128,7 @@ public class CartDAO {
 	};
 
 	public boolean increaseQuantity(int userId, int productId) {
-		 String sql = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?";
+		 String sql = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ? AND quantity<10";
 
 		    try (Connection con = DBConnection.getConnection();
 		         PreparedStatement ps = con.prepareStatement(sql)) {
