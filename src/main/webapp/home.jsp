@@ -731,7 +731,7 @@ body {
 					<!-- Product Image -->
 					<div class="product-image">
 						<a href="ProductServlet?id=<%=product.getId()%>"> <img
-							src="<%=request.getContextPath()%>/images/products/<%= (product.getImage() != null && !product.getImage().trim().isEmpty()) ? product.getImage() : "default-placeholder.png" %>"
+							src="<%=request.getContextPath()%>/images/products/<%= (product.getImage() != null && !product.getImage().trim().isEmpty()) ? product.getImage() : "default.png" %>"
 							alt="<%=product.getName()%>"
 							style="max-width: 90%; height: auto; object-fit: contain;">
 						</a>
@@ -759,9 +759,9 @@ body {
 						<p class="description">
 							<%=shortDescription%>
 						</p>
-						<form action="CheckoutServlet" method="post"
+						<form action="BuyNowServlet" method="post"
 							onsubmit="showLoader()">
-							<input type="hidden" name="id" value="<%=product.getId()%>">
+							<input type="hidden" name="productId" value="<%=product.getId()%>">
 							<button type="submit" class="buyButton">Buy Now</button>
 						</form>
 						<!-- Cart Area -->

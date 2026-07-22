@@ -21,7 +21,7 @@
 </div>
 
 	<div class="register-container">
-		<h2>User Registration</h2>
+		<h2>Seller Registration</h2>
 
 		<%
 		
@@ -67,7 +67,7 @@
 			</div>
 			<div class="form-group">
 				<label for="GSTnum">GST number:</label> <input type="text" id="GSTnum"
-					name="GSTnum"  placeholder="29ABCDE1234F1Z5"
+					name="GSTnum"  placeholder="29ABCDE1234F1Z5" maxlength=15
 					required>
 			</div>
 			<div class="form-group">

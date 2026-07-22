@@ -1,7 +1,6 @@
 package com.ecommerce.controller;
 
 import java.io.IOException;
-
 import com.ecommerce.model.Address;
 import com.ecommerce.service.OrderService;
 
@@ -16,12 +15,10 @@ import jakarta.servlet.http.HttpSession;
 public class PlaceOrderServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-
     private OrderService orderService = new OrderService();
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
@@ -33,7 +30,10 @@ public class PlaceOrderServlet extends HttpServlet {
 
         int userId = (Integer) session.getAttribute("loggedInUserId");
 
-        // Read form data
+        // Check if this is a "Buy Now" order or a normal Cart order
+        String productIdParam = request.getParameter("productId");
+
+        // Read form address data
         String fullName = request.getParameter("fullName");
         String mobile = request.getParameter("mobile");
         String addressText = request.getParameter("address");
@@ -41,12 +41,10 @@ public class PlaceOrderServlet extends HttpServlet {
         String state = request.getParameter("state");
         String pincode = request.getParameter("pincode");
 
-        boolean saveAddress =
-                request.getParameter("saveAddress") != null;
+        boolean saveAddress = request.getParameter("saveAddress") != null;
 
-        // Create Address object
+        // Populate Address object
         Address address = new Address();
-
         address.setUserId(userId);
         address.setFullName(fullName);
         address.setMobile(mobile);
@@ -55,27 +53,27 @@ public class PlaceOrderServlet extends HttpServlet {
         address.setState(state);
         address.setPincode(pincode);
 
-        // Place order
-        boolean success = orderService.placeOrder(
-                userId,
-                address,
-                saveAddress);
+        boolean success = false;
 
-        if (success) {
+        if (productIdParam != null && !productIdParam.isBlank()) {
+            // --- BUY NOW FLOW ---
+            int productId = Integer.parseInt(productIdParam);
+            // Default quantity is 1 for Buy Now (or get from request if user can change quantity)
+            int quantity = 1; 
 
-            request.setAttribute(
-                    "message",
-                    "Order placed successfully!");
-
+            // Call OrderService method to place order for a single product
+            success = orderService.placeDirectOrder(userId, productId, quantity, address, saveAddress);
         } else {
-
-            request.setAttribute(
-                    "message",
-                    "Unable to place order.");
-
+            // --- CART FLOW ---
+            success = orderService.placeOrder(userId, address, saveAddress);
         }
 
-        session.setAttribute("message", "Order placed successfully!");
-        response.sendRedirect("CartServlet");
+        if (success) {
+            session.setAttribute("message", "Order placed successfully!");
+            response.sendRedirect("OrderHistoryServlet");
+        } else {
+            session.setAttribute("message", "Unable to place order.");
+            response.sendRedirect("buynow.jsp");
+        }
     }
 }

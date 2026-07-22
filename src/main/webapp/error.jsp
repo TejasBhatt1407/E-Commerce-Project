@@ -1,4 +1,5 @@
 <%@ page isErrorPage="true" contentType="text/html;charset=UTF-8" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -54,16 +55,21 @@ a:hover{
 
     <p>
     <%
-        if(exception!=null){
-    %>
-        <%= exception.getMessage() %>
-    <%
-        }else{
-    %>
-        An unexpected error occurred.
-    <%
-        }
-    %>
+    if (session == null) {
+%>
+    Session Timed Out!
+<%
+    } else if (exception != null) {
+%>
+    <%= exception.getMessage() %>
+<%
+    } else {
+%>
+    An unexpected error occurred.
+<%
+    }
+%>
+
     </p>
 
     <a href="index.jsp">New Login</a>

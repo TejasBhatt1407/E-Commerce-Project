@@ -22,32 +22,30 @@ public class SellerLoginServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	        throws ServletException, IOException {
 
-		String email = request.getParameter("email");
-		String password = request.getParameter("password");
+	    String email = request.getParameter("email");
+	    String password = request.getParameter("password");
 
-		Response<Seller> result = sellerService.loginSeller(email, password);
+	    SellerService sellerService = new SellerService();
+	    Response<Seller> result = sellerService.loginSeller(email, password);
 
-		HttpSession session = request.getSession();
-		
-		if (result.isSuccess()) {
+	    HttpSession session = request.getSession();
 
-			
+	    if (result.isSuccess()) {
 
-			session.setAttribute("loggedInSeller", result.getData().getEmail());
-			session.setAttribute("loggedInSellerName", result.getData().getName());
-			session.setAttribute("loggedInSellerId",result.getData().getId());
-			session.setMaxInactiveInterval(10 * 60 * 60);
+	        session.setAttribute("loggedInSeller", result.getData().getEmail());
+	        session.setAttribute("loggedInSellerName", result.getData().getName());
+	        session.setAttribute("loggedInSellerId", result.getData().getId());
 
-			response.sendRedirect("SellerHomeServlet"); 
-		} else {
+	        session.setMaxInactiveInterval(10 * 60 * 60);
 
-			session.setAttribute("response", result);
+	        response.sendRedirect("SellerHomeServlet");
 
-	        // Redirect back to login page
-	        response.sendRedirect("sellerLogin.jsp");
-		}
+	    } else {
 
+	        session.setAttribute("response", result);
+	        request.getRequestDispatcher("sellerLogin.jsp").forward(request, response);
+	    }
 	}
 }

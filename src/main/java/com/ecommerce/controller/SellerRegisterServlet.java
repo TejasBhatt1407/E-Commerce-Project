@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/RegisterServlet")
+@WebServlet("/SellerRegisterServlet")
 public class SellerRegisterServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -68,6 +68,10 @@ public class SellerRegisterServlet extends HttpServlet {
         seller.setEmail(email);
         seller.setMobile(mobile);
         seller.setPassword(password);
+        seller.setCompanyName(companyName);
+        seller.setGSTNum(GSTnum);
+        seller.setBankName(bankName);
+        seller.setAddress(address);
 
         result = sellerService.registerSeller(seller);
 

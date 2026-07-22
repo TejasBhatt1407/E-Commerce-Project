@@ -6,7 +6,7 @@ public class Product {
 	public String toString() {
 		return "Product [id=" + id + ", name=" + name + ", type=" + type + ", subType=" + subType + ", price=" + price
 				+ ", quantity=" + quantity + ", description=" + description + ", cartQuantity=" + cartQuantity
-				+ ", longDescription=" + longDescription + ", image=" + image + "]";
+				+ ", longDescription=" + longDescription + ", image=" + image + ", sellerId=" + sellerId + "]";
 	}
 
 	private int id;
@@ -21,11 +21,12 @@ public class Product {
 	private String image;
 	private String typeIcon;
 	private String subtypeIcon;
+	private int sellerId;
 
 	public Product() {
 	}
 
-	public Product(int id, String name, String type, String subType, int price, int quantity, String description,String longDescription,String image) {
+	public Product(int id, String name, String type, String subType, int price, int quantity, String description,String longDescription,String image,int sellerId) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
@@ -35,6 +36,7 @@ public class Product {
 		this.description = description;
 		this.longDescription=longDescription;
 		this.image=image;
+		this.sellerId=sellerId;
 	}
 	
 	public int getId() {
@@ -127,6 +129,12 @@ public class Product {
 	}
 	public String getSubtypeIcon() {
 		return subtypeIcon;
+	}
+	public void setSellerId(int sellerId) {
+		this.sellerId=sellerId;
+	}
+	public int getSellerId() {
+		return sellerId;
 	}
 	
 }

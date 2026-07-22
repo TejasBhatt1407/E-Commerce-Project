@@ -31,4 +31,8 @@ public class ProductService {
     	ProductDAO dao=new ProductDAO();
     	return dao.getAllTypes();
     }
+    
+    public Product getProductById(int productId) {
+        return new ProductDAO().getProductById(productId);
+    }
 }

@@ -13,113 +13,128 @@ import com.ecommerce.model.Cart;
 
 public class OrderDAO {
 
-    public int createOrder(Connection con,
-                           int userId,
-                           int totalAmount,
-                           int totalItems) throws Exception {
+	public int createOrder(Connection con, int userId, int totalAmount, int totalItems) throws Exception {
 
-        String sql =
-                "INSERT INTO orders(user_id,total_amount,total_items) VALUES(?,?,?)";
+		String sql = "INSERT INTO orders(user_id,total_amount,total_items) VALUES(?,?,?)";
 
-        PreparedStatement ps =
-                con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-        ps.setInt(1, userId);
-        ps.setInt(2, totalAmount);
-        ps.setInt(3, totalItems);
+		ps.setInt(1, userId);
+		ps.setInt(2, totalAmount);
+		ps.setInt(3, totalItems);
 
-        ps.executeUpdate();
+		ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
+		ResultSet rs = ps.getGeneratedKeys();
 
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
+		if (rs.next()) {
+			return rs.getInt(1);
+		}
 
-        return -1;
-    }
-    
-    public List<Order> getOrdersByUser(int userId) {
+		return -1;
+	}
 
-        List<Order> orders = new ArrayList<>();
+	public List<Order> getOrdersByUser(int userId) {
 
-        String sql = """
-                SELECT *
-                FROM orders
-                WHERE user_id = ?
-                ORDER BY order_date DESC
-                """;
+		List<Order> orders = new ArrayList<>();
 
-        try (
-                Connection con = DBConnection.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql);
-        ) {
+		String sql = """
+				SELECT *
+				FROM orders
+				WHERE user_id = ?
+				ORDER BY order_date DESC
+				""";
 
-            ps.setInt(1, userId);
+		try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);) {
 
-            ResultSet rs = ps.executeQuery();
+			ps.setInt(1, userId);
 
-            while (rs.next()) {
+			ResultSet rs = ps.executeQuery();
 
-                Order order = new Order();
+			while (rs.next()) {
 
-                order.setId(rs.getInt("id"));
-                order.setUserId(rs.getInt("user_id"));
-                order.setTotalAmount(rs.getInt("total_amount"));
-                order.setTotalItems(rs.getInt("total_items"));
-                order.setOrderDate(rs.getTimestamp("order_date"));
-                order.setStatus(rs.getString("status"));
+				Order order = new Order();
 
-                orders.add(order);
-            }
+				order.setId(rs.getInt("id"));
+				order.setUserId(rs.getInt("user_id"));
+				order.setTotalAmount(rs.getInt("total_amount"));
+				order.setTotalItems(rs.getInt("total_items"));
+				order.setOrderDate(rs.getTimestamp("order_date"));
+				order.setStatus(rs.getString("status"));
 
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
+				orders.add(order);
+			}
 
-        return orders;
-    }
-    
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
-    public void saveOrderItems(Connection con,
-                               int orderId,
-                               List<Cart> cartItems) throws Exception {
+		return orders;
+	}
 
-        String sql =
-                "INSERT INTO order_items(order_id,product_id,quantity,price) VALUES(?,?,?,?)";
+	public void saveOrderItems(Connection con, int orderId, List<Cart> cartItems) throws Exception {
 
-        PreparedStatement ps = con.prepareStatement(sql);
+		String sql = "INSERT INTO order_items(order_id,product_id,quantity,price) VALUES(?,?,?,?)";
 
-        for (Cart cart : cartItems) {
+		PreparedStatement ps = con.prepareStatement(sql);
 
-            ps.setInt(1, orderId);
-            ps.setInt(2, cart.getProduct().getId());
-            ps.setInt(3, cart.getQuantity());
-            ps.setInt(4, cart.getProduct().getPrice());
+		for (Cart cart : cartItems) {
 
-            ps.addBatch();
-        }
+			ps.setInt(1, orderId);
+			ps.setInt(2, cart.getProduct().getId());
+			ps.setInt(3, cart.getQuantity());
+			ps.setInt(4, cart.getProduct().getPrice());
 
-        ps.executeBatch();
-    }
+			ps.addBatch();
+		}
 
-    public void updateProductQuantity(Connection con,
-                                      List<Cart> cartItems) throws Exception {
+		ps.executeBatch();
+	}
 
-        String sql =
-                "UPDATE products SET quantity = quantity - ? WHERE id=?";
+	public void updateProductQuantity(Connection con, List<Cart> cartItems) throws Exception {
 
-        PreparedStatement ps = con.prepareStatement(sql);
+		String sql = "UPDATE products SET quantity = quantity - ? WHERE id=?";
 
-        for (Cart cart : cartItems) {
+		PreparedStatement ps = con.prepareStatement(sql);
 
-            ps.setInt(1, cart.getQuantity());
-            ps.setInt(2, cart.getProduct().getId());
+		for (Cart cart : cartItems) {
 
-            ps.addBatch();
-        }
+			ps.setInt(1, cart.getQuantity());
+			ps.setInt(2, cart.getProduct().getId());
 
-        ps.executeBatch();
-    }
+			ps.addBatch();
+		}
+
+		ps.executeBatch();
+	}
+
+	public void saveOrderItem(Connection con, int orderId, int productId, int quantity, int price) throws Exception {
+
+		String sql = "INSERT INTO order_items(order_id, product_id, quantity, price) VALUES(?,?,?,?)";
+
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, orderId);
+			ps.setInt(2, productId);
+			ps.setInt(3, quantity);
+			ps.setInt(4, price);
+
+			ps.executeUpdate();
+		}
+	}
+
+	/**
+	 * Updates inventory for a single product (Buy Now flow).
+	 */
+	public void updateSingleProductQuantity(Connection con, int productId, int quantity) throws Exception {
+
+		String sql = "UPDATE products SET quantity = quantity - ? WHERE id = ?";
+
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, quantity);
+			ps.setInt(2, productId);
+
+			ps.executeUpdate();
+		}
+	}
 
 }
