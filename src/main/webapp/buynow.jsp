@@ -181,8 +181,11 @@ textarea {
 
     <div class="container">
         <div class="header-section">
+        
             <h1>Checkout</h1>
             <div style="width: 100px;"></div> <!-- Spacer balance -->
+                    <a href="HomeServlet" class="back-btn">Home</a>
+            
         </div>
 
         <form action="PlaceOrderServlet" method="post" onsubmit="return showLoader();">
@@ -228,7 +231,7 @@ textarea {
                         <label for="saveAddress" style="display:inline; font-weight:normal; margin:0;">Save this address for future orders</label>
                     </div>
                     
-                    <a href="HomeServlet" class="back-btn">Home</a>
+                    
                 </div>
 
                 <!-- Right Column: Order Summary -->

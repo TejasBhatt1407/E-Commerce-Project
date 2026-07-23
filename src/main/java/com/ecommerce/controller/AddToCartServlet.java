@@ -3,7 +3,9 @@ package com.ecommerce.controller;
 import java.io.IOException;
 
 import com.ecommerce.dao.CartDAO;
+import com.ecommerce.model.Product;
 import com.ecommerce.service.CartService;
+import com.ecommerce.service.ProductService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -38,7 +40,7 @@ public class AddToCartServlet extends HttpServlet {
             response.sendRedirect("HomeServlet");
             return;
         }
-
+       
         Integer userId = (Integer) session.getAttribute("loggedInUserId");
 
         if(userId == null){
@@ -55,6 +57,14 @@ public class AddToCartServlet extends HttpServlet {
 
         int productId = Integer.parseInt(pid);
         CartService cartService = new CartService();
+        ProductService productService=new ProductService();
+        
+        Product product = productService.getProductById(productId);
+
+        if (product.getQuantity() <= 0) {
+            // Don't add to cart
+            return;
+        }
 
         cartService.addToCart(userId, productId);
 

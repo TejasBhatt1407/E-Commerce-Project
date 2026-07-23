@@ -160,7 +160,7 @@ textarea {
 </div>
 
 	<div class="container">
-
+<a href=CartServlet class="back-btn">Previous</a>
 		<h1>Checkout</h1>
 
 		<form action="PlaceOrderServlet" method="post" onsubmit="showLoader">
@@ -235,7 +235,7 @@ textarea {
 		</form>
 
 
-<a href=CartServlet class="back-btn">Previous</a>
+
 
 	</div>
 

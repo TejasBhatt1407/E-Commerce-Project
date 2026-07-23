@@ -93,7 +93,7 @@ public class OrderDAO {
 
 	public void updateProductQuantity(Connection con, List<Cart> cartItems) throws Exception {
 
-		String sql = "UPDATE products SET quantity = quantity - ? WHERE id=?";
+		String sql = "UPDATE products SET quantity = quantity - ? WHERE id=? AND quantity>=?";
 
 		PreparedStatement ps = con.prepareStatement(sql);
 
@@ -101,12 +101,18 @@ public class OrderDAO {
 
 			ps.setInt(1, cart.getQuantity());
 			ps.setInt(2, cart.getProduct().getId());
-
+			ps.setInt(3,cart.getQuantity());
 			ps.addBatch();
 		}
 
-		ps.executeBatch();
-	}
+		int[] result = ps.executeBatch();
+
+		for (int rows : result) {
+		    if (rows == 0) {
+		        throw new Exception("One or more products are out of stock.");
+		    }
+		}
+		}
 
 	public void saveOrderItem(Connection con, int orderId, int productId, int quantity, int price) throws Exception {
 
@@ -127,14 +133,20 @@ public class OrderDAO {
 	 */
 	public void updateSingleProductQuantity(Connection con, int productId, int quantity) throws Exception {
 
-		String sql = "UPDATE products SET quantity = quantity - ? WHERE id = ?";
+		String sql = "UPDATE products SET quantity = quantity - ? WHERE id = ? AND quantity>=?";
 
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setInt(1, quantity);
 			ps.setInt(2, productId);
+			ps.setInt(3, quantity);
 
-			ps.executeUpdate();
-		}
+			int rowsUpdated = ps.executeUpdate();
+
+	        if (rowsUpdated == 0) {
+	            // Either the productId doesn't exist OR stock was insufficient
+	            throw new Exception("Insufficient stock or product not found.");
+	        }
+	        }
 	}
 
 }

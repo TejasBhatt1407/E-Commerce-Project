@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ecommerce.model.Product;
 import com.ecommerce.model.Seller;
+import com.ecommerce.model.SellerDashboard;
+import com.ecommerce.model.SellerProductSales;
 import com.ecommerce.util.DBConnection;
 
 public class SellerDAO {
@@ -165,6 +167,89 @@ public class SellerDAO {
             throw new RuntimeException(e);
         }
         return productList;
+    }
+    
+    public List<SellerProductSales> getSellerProductsSales(int sellerId) {
+
+        List<SellerProductSales> sales = new ArrayList<>();
+
+        String sql =
+            "SELECT p.id, p.name, p.quantity AS stock_left, " +
+            "COALESCE(SUM(oi.quantity),0) AS sold_qty, " +
+            "COALESCE(SUM(oi.quantity * oi.price),0) AS total_sales " +
+            "FROM products p " +
+            "LEFT JOIN order_items oi ON p.id = oi.product_id " +
+            "LEFT JOIN orders o ON oi.order_id = o.id " +
+            "WHERE p.seller_id = ? " +
+            "AND (o.status='Placed' OR o.status IS NULL) " +
+            "GROUP BY p.id, p.name, p.quantity " +
+            "ORDER BY p.name";
+
+        try (
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, sellerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                SellerProductSales sale = new SellerProductSales();
+
+                sale.setProductId(rs.getInt("id"));
+                sale.setProductName(rs.getString("name"));
+                sale.setStockLeft(rs.getInt("stock_left"));
+                sale.setSoldQuantity(rs.getInt("sold_qty"));
+                sale.setTotalSales(rs.getInt("total_sales"));
+
+                sales.add(sale);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sales;
+    }
+    
+    public SellerDashboard getSellerDashboard(int sellerId) {
+
+        SellerDashboard dashboard = new SellerDashboard();
+
+        String sql =
+            "SELECT " +
+            "COUNT(DISTINCT p.id) AS total_products, " +
+            "COALESCE(SUM(oi.quantity),0) AS total_units_sold, " +
+            "COALESCE(SUM(oi.quantity * oi.price),0) AS total_revenue " +
+            "FROM products p " +
+            "LEFT JOIN order_items oi ON p.id = oi.product_id " +
+            "LEFT JOIN orders o ON oi.order_id = o.id " +
+            "WHERE p.seller_id = ? " +
+            "AND (o.status='Placed' OR o.status IS NULL)";
+
+        try (
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, sellerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                dashboard.setTotalProducts(rs.getInt("total_products"));
+                dashboard.setTotalUnitsSold(rs.getInt("total_units_sold"));
+                dashboard.setTotalRevenue(rs.getInt("total_revenue"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dashboard;
     }
     
 }

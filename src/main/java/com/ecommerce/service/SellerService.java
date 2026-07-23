@@ -7,12 +7,22 @@ import jakarta.servlet.http.HttpSession;
 import com.ecommerce.dao.SellerDAO;
 import com.ecommerce.model.Product;
 import com.ecommerce.model.Seller;
+import com.ecommerce.model.SellerDashboard;
+import com.ecommerce.model.SellerProductSales;
 import com.ecommerce.util.Response;
 import com.ecommerce.util.ResponseCode;
 
 public class SellerService {
 
     private SellerDAO sellerDAO = new SellerDAO();
+    
+    public List<SellerProductSales> getSellerProductsSales(int sellerId) {
+        return sellerDAO.getSellerProductsSales(sellerId);
+    }
+
+    public SellerDashboard getSellerDashboard(int sellerId) {
+        return sellerDAO.getSellerDashboard(sellerId);
+    }
 
     public Response<Seller> loginSeller(String email, String password) {
 

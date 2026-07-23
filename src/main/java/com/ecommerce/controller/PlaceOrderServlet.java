@@ -55,25 +55,37 @@ public class PlaceOrderServlet extends HttpServlet {
 
         boolean success = false;
 
-        if (productIdParam != null && !productIdParam.isBlank()) {
-            // --- BUY NOW FLOW ---
-            int productId = Integer.parseInt(productIdParam);
-            // Default quantity is 1 for Buy Now (or get from request if user can change quantity)
-            int quantity = 1; 
 
-            // Call OrderService method to place order for a single product
-            success = orderService.placeDirectOrder(userId, productId, quantity, address, saveAddress);
-        } else {
-            // --- CART FLOW ---
-            success = orderService.placeOrder(userId, address, saveAddress);
-        }
+if (productIdParam != null && !productIdParam.isBlank()) {
 
-        if (success) {
-            session.setAttribute("message", "Order placed successfully!");
-            response.sendRedirect("OrderHistoryServlet");
-        } else {
-            session.setAttribute("message", "Unable to place order.");
-            response.sendRedirect("buynow.jsp");
-        }
+    // BUY NOW
+    int productId = Integer.parseInt(productIdParam);
+    int quantity = 1;
+
+    success = orderService.placeDirectOrder(userId, productId, quantity, address, saveAddress);
+
+    if (success) {
+        session.setAttribute("message", "Order placed successfully!");
+        response.sendRedirect("OrderHistoryServlet");
+    } else {
+        session.setAttribute("message", "Product is out of stock.");
+        response.sendRedirect("buynow.jsp?productId=" + productId);
     }
+
+} else {
+
+    // CART
+    success = orderService.placeOrder(userId, address, saveAddress);
+
+    if (success) {
+        session.setAttribute("message", "Order placed successfully!");
+        response.sendRedirect("OrderHistoryServlet");
+    } else {
+        session.setAttribute("message", "One or more products are out of stock.");
+        response.sendRedirect("CartServlet");
+    }
+
+}
+
+}
 }
