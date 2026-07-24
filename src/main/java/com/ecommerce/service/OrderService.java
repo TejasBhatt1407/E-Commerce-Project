@@ -51,7 +51,7 @@ public class OrderService {
 				addressDAO.saveAddress(con, address);
 			}
 
-			int orderId = orderDAO.createOrder(con, userId, totalAmount, totalItems);
+			int orderId = orderDAO.createOrder(con, userId, totalAmount, totalItems,"RAZORPAY","PENDING");
 
 			orderDAO.saveOrderItems(con, orderId, cartItems);
 			orderDAO.updateProductQuantity(con, cartItems);
@@ -109,7 +109,7 @@ public class OrderService {
 			}
 
 			// 4. Create main order record
-			int orderId = orderDAO.createOrder(con, userId, totalAmount, totalItems);
+			int orderId = orderDAO.createOrder(con, userId, totalAmount, totalItems,"RAZORPAY","PENDING");
 
 			if (orderId != -1) {
 				// 5. Insert single item into order_items

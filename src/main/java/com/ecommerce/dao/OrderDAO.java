@@ -13,15 +13,18 @@ import com.ecommerce.model.Cart;
 
 public class OrderDAO {
 
-	public int createOrder(Connection con, int userId, int totalAmount, int totalItems) throws Exception {
+	public int createOrder(Connection con, int userId, int totalAmount, int totalItems,String paymentMethod , String paymentStatus) 
+			throws Exception {
 
-		String sql = "INSERT INTO orders(user_id,total_amount,total_items) VALUES(?,?,?)";
+		String sql = "INSERT INTO orders(user_id,total_amount,total_items,payment_method , payment_status) VALUES(?,?,?,?,?)";
 
 		PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 		ps.setInt(1, userId);
 		ps.setInt(2, totalAmount);
 		ps.setInt(3, totalItems);
+		ps.setString(4, paymentMethod);
+		ps.setString(5, paymentStatus);
 
 		ps.executeUpdate();
 
