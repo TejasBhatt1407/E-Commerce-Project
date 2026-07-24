@@ -276,6 +276,8 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	padding:15px;
+	box_sizing:border-box;
 }
 
 .productContent h3 {
@@ -300,6 +302,7 @@ body {
 	height: auto;
 	width: auto;
 	object-fit: contain;
+	mix-blend-mode:multiply
 }
 
 .description {
@@ -636,7 +639,7 @@ body {
 							<button class="typeButton">
 
 								<img
-									src="<%=request.getContextPath()%>/images/icons/<%=type.getIcon()%>"
+src="<%=request.getContextPath()%>/images/icons/<%= (type.getIcon() != null && !type.getIcon().trim().isEmpty()) ? type.getIcon() : "settings.svg" %>"
 									class="categoryIcon">
 
 								<%=type.getName()%>
@@ -693,7 +696,7 @@ body {
 								value="<%=subType.getName()%>">
 							<button class="subTypeButton">
 								<img
-									src="<%=request.getContextPath()%>/images/icons/<%=subType.getIcon()%>"
+src="<%=request.getContextPath()%>/images/icons/<%= (subType.getIcon() != null && !subType.getIcon().trim().isEmpty()) ? subType.getIcon() : "subtypedefault.svg" %>"
 									class="categoryIcon">
 								<%=subType.getName()%>
 							</button>

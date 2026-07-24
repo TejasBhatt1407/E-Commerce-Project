@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.ecommerce.dao.ProductDAO;
 import com.ecommerce.model.Product;
 import com.ecommerce.service.SellerService;
 import com.ecommerce.util.Response;
@@ -72,13 +73,46 @@ public class SellerHomeServlet extends HttpServlet {
 
         Integer sellerId = (Integer) session.getAttribute("loggedInSellerId");
         
-        // This will now successfully read "addProduct" thanks to @MultipartConfig
+        // This will now successfully read "addProduct" due to @MultipartConfig
         String action = request.getParameter("action"); 
+        ProductDAO productDAO= new ProductDAO();
+        
 
-        if ("addProduct".equals(action)) {
+        if ("addStock".equals(action)) {
+            try {
+                int productId = Integer.parseInt(request.getParameter("productId"));
+                int qtyToAdd = Integer.parseInt(request.getParameter("quantityToAdd"));
+                
+                productDAO.addProductStock(productId, qtyToAdd);
+                
+                // Redirect back to the history page so the updated stock shows
+                response.setContentType("application/json");
+                response.getWriter().write("{\"status\":\"success\"}");
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect("SellerHomeServlet?action=history");
+            }
+            return;
+            
+        } else if ("removeProduct".equals(action)) {
+            try {
+                int productId = Integer.parseInt(request.getParameter("productId"));
+                
+                productDAO.removeProduct(productId);
+                
+                // Redirect back to the history page
+                response.setContentType("application/json");
+                response.getWriter().write("{\"status\":\"success\"}");
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect("SellerHomeServlet?action=history");
+            }
+            return;
+            
+        } else if ("addProduct".equals(action)) {
             try {
                 Product product = new Product();
-
+                
                 // Standard text fields
                 product.setName(request.getParameter("name"));
                 product.setType(request.getParameter("type"));
@@ -101,9 +135,6 @@ public class SellerHomeServlet extends HttpServlet {
                     // Extract the filename safely
                     String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                     
-                    // You might want to actually write the file to your server here using:
-                    // filePart.write("path/to/uploads/" + fileName);
-                    
                     // Save just the filename string to the database model
                     product.setImage(fileName); 
                 } else {
@@ -122,9 +153,10 @@ public class SellerHomeServlet extends HttpServlet {
                 doGet(request, response);
             }
         } else {
+            // Catch-all for unknown actions
             response.sendRedirect("SellerHomeServlet?action=history");
         }
-    }
+    }        
 
     /**
      * Helper method to safely parse integer inputs from forms.

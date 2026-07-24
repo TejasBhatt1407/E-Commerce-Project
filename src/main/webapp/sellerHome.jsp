@@ -2,6 +2,8 @@
 <%@ page import="java.util.List, java.util.ArrayList" %>
 <%@ page import="com.ecommerce.model.Product, com.ecommerce.model.SellerDashboard, com.ecommerce.model.SellerProductSales" %>
 
+
+
 <%
     // Safely retrieve and cast attributes, providing defaults to avoid NullPointerExceptions at runtime
     List<Product> products = (List<Product>) request.getAttribute("products");
@@ -226,14 +228,29 @@ body {
                 <th>Stock Left</th>
                 <th>Units Sold</th>
                 <th>Total Revenue</th>
+                <th>Actions</th>
             </tr>
             <% if (!sales.isEmpty()) { 
                 for (SellerProductSales sale : sales) { %>
-                    <tr>
+                    <tr id="row-<%= sale.getProductId() %>">
                         <td><%= sale.getProductName() %></td>
-                        <td><%= sale.getStockLeft() %></td>
+                        <td id="stock-<%= sale.getProductId() %>"><%= sale.getStockLeft() %></td>
                         <td><%= sale.getSoldQuantity() %></td>
                         <td>₹<%= sale.getTotalSales() %></td>
+                        
+                        <td>
+                        
+                        
+    <!-- Form to Add Stock -->
+    <div style="display:inline-block; margin-right: 10px;">
+            <input type="number" id="qtyToAdd-<%= sale.getProductId() %>" min="1" style="width: 70px;" placeholder="+ Qty">
+            <button type="button" class="btn btn-sm btn-success" onclick="addStockViaAjax(<%= sale.getProductId() %>, this)">Add</button>
+        </div>
+        
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeProductViaAjax(<%= sale.getProductId() %>, this)">Remove</button>
+        
+</td>
+                        
                     </tr>
                 <% } 
             } else { %>
@@ -244,102 +261,149 @@ body {
         </table>
     </div>
 
-    <!-- ================= ADD PRODUCT FORM ================= -->
-    <div class="section" id="addProduct">
-        <h2>Add Product</h2>
-        
-        <!-- Note: Because enctype is multipart/form-data, standard request.getParameter("action") in Servlet will return NULL 
-             UNLESS your Servlet is annotated with @MultipartConfig -->
-        <form action="/SellerHomeServlet" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="action" value="addProduct">
+   <!-- ================= ADD PRODUCT FORM ================= -->
+<div class="section" id="addProduct">
+    <h2>Add Product</h2>
+    
+    <form action="SellerHomeServlet" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="addProduct">
 
-            <div class="formGrid">
+        <div class="formGrid">
 
-                <div class="formGroup">
-                    <label>Product Name</label>
-                    <input type="text" name="name" required>
-                </div>
-
-                <div class="formGroup">
-                    <label>Product Type</label>
-                    <select name="type" id="productType" onchange="updateSubTypes()" required>
-                        <option value="">Select Type</option>
-                        <% for (String type : types) { %>
-                            <option value="<%= type %>"><%= type %></option>
-                        <% } %>
-                    </select>
-                </div>
-
-                <div class="formGroup">
-                    <label>Product Sub Type</label>
-                    <select name="subType" id="productSubType" required disabled>
-                        <option value="">Select Sub Type</option>
-                    </select>
-                </div>
-
-                <div class="formGroup">
-                    <label>Price (Rs)</label>
-                    <input type="number" name="price" min="0" step="1" required>
-                </div>
-
-                <div class="formGroup">
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" min="1" required>
-                </div>
-
-                <div class="formGroup">
-                    <label>Image</label>
-                    <input type="file" name="image" accept="image/*" required>
-                </div>
-
-                <div class="formGroup fullWidth">
-                    <label>Short Description</label>
-                    <textarea rows="3" name="description" required></textarea>
-                </div>
-
-                <div class="formGroup fullWidth">
-                    <label>Long Description</label>
-                    <textarea rows="6" name="longDescription" required></textarea>
-                </div>
-
-                <div class="fullWidth">
-                    <button class="addBtn" type="submit">Add Product</button>
-                </div>
-
+            <div class="formGroup">
+                <label>Product Name</label>
+                <input type="text" name="name" required>
             </div>
-        </form>
-    </div>
+
+            <div class="formGroup">
+                <label>Product Type</label>
+                <select name="type" id="productType" required>
+                    <option value="">Select Type</option>
+                    <% for (String type : types) { %>
+                        <option value="<%= type %>"><%= type %></option>
+                    <% } %>
+                </select>
+            </div>
+
+            <!-- Changed from disabled <select> to standard <input> -->
+            <div class="formGroup">
+                <label>Product Sub Type</label>
+                <input type="text" name="subType" placeholder="e.g. Mobiles, Laptops..." required>
+            </div>
+
+            <div class="formGroup">
+                <label>Price (Rs)</label>
+                <input type="number" name="price" min="0" step="0.01" required>
+            </div>
+
+            <div class="formGroup">
+                <label>Quantity</label>
+                <input type="number" name="quantity" min="1" required>
+            </div>
+
+            <div class="formGroup">
+                <label>Image</label>
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+
+            <div class="formGroup fullWidth">
+                <label>Short Description</label>
+                <textarea rows="3" name="description" ></textarea>
+            </div>
+
+            <div class="formGroup fullWidth">
+                <label>Long Description</label>
+                <textarea rows="6" name="longDescription" ></textarea>
+            </div>
+
+            <div class="fullWidth">
+                <button class="addBtn" type="submit">Add Product</button>
+            </div>
+
+        </div>
+    </form>
+</div>
 </div>
 
+
 <script>
-  // Ensure this mapping aligns with whatever dynamic "types" the Servlet is passing, 
-  // otherwise selecting a dynamic type not in this list will fail to generate sub-types.
-  const subTypeMapping = {
-    "Electronics": ["Mobiles", "Laptops", "Accessories"],
-    "Clothing": ["Men's Wear", "Women's Wear", "Kids"],
-    "Home Goods": ["Furniture", "Decor", "Kitchen"]
-  };
+    function addStockViaAjax(productId, buttonElement) {
+        const qtyInput = document.getElementById('qtyToAdd-' + productId);
+        const qtyToAdd = parseInt(qtyInput.value);
 
-  function updateSubTypes() {
-    const typeSelect = document.getElementById("productType");
-    const subTypeSelect = document.getElementById("productSubType");
-    const selectedType = typeSelect.value;
+        if (!qtyToAdd || qtyToAdd < 1) {
+            alert("Please enter a valid quantity.");
+            return;
+        }
 
-    // Reset sub-types
-    subTypeSelect.innerHTML = '<option value="">Select Sub Type</option>';
+        // Disable button while processing to prevent double-clicks
+        buttonElement.disabled = true;
+        buttonElement.innerText = "...";
 
-    if (selectedType && subTypeMapping[selectedType]) {
-      subTypeSelect.disabled = false;
-      subTypeMapping[selectedType].forEach(function(subType) {
-        const option = document.createElement("option");
-        option.value = subType;
-        option.textContent = subType;
-        subTypeSelect.appendChild(option);
-      });
-    } else {
-      subTypeSelect.disabled = true;
+        // Prepare data to send to Servlet
+        const params = new URLSearchParams();
+        params.append('action', 'addStock');
+        params.append('productId', productId);
+        params.append('quantityToAdd', qtyToAdd);
+
+        // Send AJAX request
+        fetch('SellerHomeServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(response => {
+            if (response.ok) {
+                // Instantly update the stock number on the screen
+                const stockCell = document.getElementById('stock-' + productId);
+                const currentStock = parseInt(stockCell.innerText);
+                stockCell.innerText = currentStock + qtyToAdd;
+                
+                // Clear the input field
+                qtyInput.value = '';
+            } else {
+                alert("Failed to update stock. Please try again.");
+            }
+        })
+        .catch(error => console.error('Error:', error))
+        .finally(() => {
+            // Re-enable button
+            buttonElement.disabled = false;
+            buttonElement.innerText = "Add";
+        });
     }
-  }
+
+    function removeProductViaAjax(productId, buttonElement) {
+        if (!confirm('Are you sure you want to remove this product? It will be marked as out of stock.')) {
+            return;
+        }
+
+        buttonElement.disabled = true;
+        buttonElement.innerText = "...";
+
+        const params = new URLSearchParams();
+        params.append('action', 'removeProduct');
+        params.append('productId', productId);
+
+        fetch('SellerHomeServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(response => {
+            if (response.ok) {
+                // Instantly update the stock to 0 on the screen
+                document.getElementById('stock-' + productId).innerText = '0';
+            } else {
+                alert("Failed to remove product.");
+            }
+        })
+        .catch(error => console.error('Error:', error))
+        .finally(() => {
+            buttonElement.disabled = false;
+            buttonElement.innerText = "Remove";
+        });
+    }
 </script>
 
 </body>

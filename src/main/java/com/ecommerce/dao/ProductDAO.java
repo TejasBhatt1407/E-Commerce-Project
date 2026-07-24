@@ -16,7 +16,7 @@ public class ProductDAO {
 		Product product = null;
 		try {
 			Connection con = DBConnection.getConnection();
-			String sql = "select * from products where id=?";
+			String sql = "select * from products where id=? AND quantity>0";
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.setInt(1, id);
 			ResultSet rs = ps.executeQuery();
@@ -45,7 +45,7 @@ public class ProductDAO {
 
 		List<Product> products = new ArrayList<>();
 
-		String sql = "SELECT * FROM products";
+		String sql = "SELECT * FROM products WHERE quantity > 0";
 
 		try (Connection con = DBConnection.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql);
@@ -80,7 +80,7 @@ public class ProductDAO {
 
 		List<Category> types = new ArrayList<>();
 
-		String sql = "SELECT DISTINCT type , type_icon FROM products ORDER BY type";
+		String sql = "SELECT type , MAX(type_icon) AS type_icon FROM products GROUP BY type ORDER BY type";
 
 		try (Connection con = DBConnection.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql);
@@ -127,6 +127,7 @@ public class ProductDAO {
 				AND c.user_id = ?
 				WHERE p.type = ?
 				AND p.sub_type = ?
+				AND p.quantity>0
 				""";
 
 		try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);) {
@@ -167,7 +168,11 @@ public class ProductDAO {
 
 	public List<Category> getSubTypes(String type) {
 		List<Category> subTypes = new ArrayList<>();
-		String sql = "select distinct sub_type , subtype_icon from products where type =? order by sub_type";
+		String sql = "SELECT sub_type, MAX(subtype_icon) AS subtype_icon "
+				+ "FROM products "
+				+ "WHERE type = ? "
+				+ "GROUP BY sub_type "
+				+ "ORDER BY sub_type";
 		try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, type);
 			ResultSet rs = ps.executeQuery();
@@ -204,9 +209,11 @@ public class ProductDAO {
 				LEFT JOIN cart c
 				ON p.id = c.product_id
 				AND c.user_id = ?
-				WHERE LOWER(p.name) LIKE ?
+				WHERE p.quantity>0
+				AND ( LOWER(p.name) LIKE ?
 				   OR LOWER(p.type) LIKE ?
 				   OR LOWER(p.sub_type) LIKE ?
+				   )
 				ORDER BY p.name
 				""";
 
@@ -243,6 +250,39 @@ public class ProductDAO {
 		}
 
 		return products;
+	}
+	
+	// 1. Method to increase stock
+	public void addProductStock(int productId, int additionalStock) {
+	    // We use quantity = quantity + ? to safely add to the existing amount
+	    String sql = "UPDATE products SET quantity = quantity + ? WHERE id = ?";
+	    
+	    try (Connection con = DBConnection.getConnection(); 
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+	         
+	        ps.setInt(1, additionalStock);
+	        ps.setInt(2, productId);
+	        ps.executeUpdate();
+	        
+	    } catch (Exception e) {
+	        throw new RuntimeException(e);
+	    }
+	}
+	
+	// 2. Method to remove product (set stock to 0)
+	public void removeProduct(int productId) {
+	    // Sets quantity to 0 so it disappears from the user store but keeps sales history intact
+	    String sql = "UPDATE products SET quantity = 0 WHERE id = ?";
+	    
+	    try (Connection con = DBConnection.getConnection(); 
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+	         
+	        ps.setInt(1, productId);
+	        ps.executeUpdate();
+	        
+	    } catch (Exception e) {
+	        throw new RuntimeException(e);
+	    }
 	}
 
 }

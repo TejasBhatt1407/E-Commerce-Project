@@ -150,15 +150,14 @@ button {
 			<%
 		String image = product.getImage();
 		if (image == null || image.trim().isEmpty()) {
-		    image = "default-placeholder.png";
+		    image = "default.png";
 		} else {
 		    image = product.getImage().trim();
 		}
 		%>
-			<img
-				src="<%= request.getContextPath() %>/images/products/<%= image %>"
-				alt="<%= (product.getName() != null) ? product.getName() : "Product Image" %>"
-				style="max-width: 90%; height: auto; object-fit: contain;">
+<img src="<%= request.getContextPath() %>/images/products/<%= (image != null && !image.trim().isEmpty() && !image.equals("null")) ? image : "default.png" %>"   
+style="max-width: 90%; height: auto; object-fit: contain;"/>    				
+
 		</div>
 
 		<div class="right">

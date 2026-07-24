@@ -54,24 +54,9 @@ public class ProductServlet extends HttpServlet {
 
     	request.setAttribute("selectedQuantity", selectedQuantity);
     	
-//    	System.out.println("Action = " + request.getParameter("action"));
-//    	System.out.println("Quantity = " + request.getParameter("quantity"));
-//    	System.out.println("Product Id = " + request.getParameter("id"));
-    	
     	request.setAttribute("product", product);
     	request.setAttribute("selectedQuantity", selectedQuantity);
     	request.getRequestDispatcher("product.jsp").forward(request,response);
-    	
-    	
-    	
-    	
-     //   List<Product> products = productService.getAllProducts();
 
-    //    request.setAttribute("products", products);
-
-//        request.getRequestDispatcher("HomeServlet")//homeServlet soon
-//               .forward(request, response);
-
-    
     }
 }
